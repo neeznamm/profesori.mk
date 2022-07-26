@@ -28,6 +28,9 @@ public class StudyProgramme {
     @Column(name = "name")
     private String studyProgrammeName;
 
+    @Column(name = "cycle")
+    private int cycle;
+
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
@@ -42,6 +45,10 @@ public class StudyProgramme {
 
     public String getStudyProgrammeName() {
         return studyProgrammeName;
+    }
+
+    public int getCycle() {
+        return cycle;
     }
 
     @JsonBackReference

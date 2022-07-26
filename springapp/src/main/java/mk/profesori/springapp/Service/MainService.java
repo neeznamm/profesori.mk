@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import mk.profesori.springapp.Repository.CityRepository;
 import mk.profesori.springapp.Repository.FacultyRepository;
 import mk.profesori.springapp.Repository.ProfessorRepository;
+import mk.profesori.springapp.Repository.StudyProgrammeRepository;
 import mk.profesori.springapp.Repository.UniversityRepository;
 import mk.profesori.springapp.Model.City;
 import mk.profesori.springapp.Model.Faculty;
 import mk.profesori.springapp.Model.Professor;
+import mk.profesori.springapp.Model.StudyProgramme;
 import mk.profesori.springapp.Model.University;
 
 @Service        
@@ -20,6 +22,8 @@ public class MainService {
     
     @Autowired
     private ProfessorRepository professorRepository;
+    @Autowired
+    private StudyProgrammeRepository studyProgrammeRepository;
     @Autowired
     private FacultyRepository facultyRepository;
     @Autowired
@@ -45,6 +49,27 @@ public class MainService {
 
         List<Professor> list = new ArrayList<>();
         professorRepository.findByFaculty(faculty).forEach(list::add);
+        return list;
+    }
+
+    public List<StudyProgramme> getAllStudyProgrammes() {
+
+        List<StudyProgramme> list = new ArrayList<>();
+        studyProgrammeRepository.findAll().forEach(list::add);
+        return list;
+    }
+
+    public StudyProgramme getStudyProgrammeById(Long id) {
+
+        return studyProgrammeRepository.findByStudyProgrammeId(id);
+    }
+
+    public List<StudyProgramme> getStudyProgrammesByFacultyId(Long facultyId) {
+        
+        Faculty faculty = facultyRepository.findByFacultyId(facultyId);
+
+        List<StudyProgramme> list = new ArrayList<>();
+        studyProgrammeRepository.findByFaculty(faculty).forEach(list::add);
         return list;
     }
 
