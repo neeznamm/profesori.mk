@@ -1,8 +1,10 @@
 package mk.profesori.springapp.Model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -18,6 +20,8 @@ import javax.persistence.SequenceGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,6 +49,8 @@ public class CustomUserDetails implements UserDetails {
     private Boolean enabled = false;
     @OneToMany(mappedBy = "customUserDetails", cascade = CascadeType.ALL)
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Post> authoredPosts = new ArrayList<>();
 
     public CustomUserDetails(String fullName, String username, String email, String password, UserRole userRole) {
         this.fullName = fullName;
@@ -88,6 +94,11 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @JsonManagedReference
+    List<Post> getAuthoredPosts() {
+        return this.authoredPosts;
     }
     
 }

@@ -1,0 +1,163 @@
+package mk.profesori.springapp.Model;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+@Entity(name="post")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="post_type", 
+  discriminatorType = DiscriminatorType.STRING)
+public class Post {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long postId;
+    
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "content", columnDefinition="TEXT")
+    private String content;
+    
+    @ManyToOne
+    @JoinColumn(name = "custom_user_details_id")
+    private CustomUserDetails author;
+    
+    @Column(name = "time_posted")
+    private LocalDateTime timePosted;
+
+    @Column(name = "time_last_edited")
+    private LocalDateTime timeLastEdited;
+
+    @Column(name = "upvote_count")
+    private Integer upvoteCount;
+
+    @Column(name = "downvote_count")
+    private Integer downvoteCount;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_post_id", nullable = true)
+    private Post parent;
+    
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private List<Post> children = new ArrayList<>();
+
+    //getters and setters
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+    
+    @JsonBackReference
+    public CustomUserDetails getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(CustomUserDetails author) {
+        this.author = author;
+    }
+
+    public LocalDateTime getTimePosted() {
+        return timePosted;
+    }
+
+    public void setTimePosted(LocalDateTime timePosted) {
+        this.timePosted = timePosted;
+    }
+
+    public LocalDateTime getTimeLastEdited() {
+        return timeLastEdited;
+    }
+
+    public void setTimeLastEdited(LocalDateTime timeLastEdited) {
+        this.timeLastEdited = timeLastEdited;
+    }
+
+    public Integer getUpvoteCount() {
+        return upvoteCount;
+    }
+
+    public void setUpvoteCount(Integer upvoteCount) {
+        this.upvoteCount = upvoteCount;
+    }
+
+    public Integer getDownvoteCount() {
+        return downvoteCount;
+    }
+
+    public void setDownvoteCount(Integer downvoteCount) {
+        this.downvoteCount = downvoteCount;
+    }
+
+    @JsonBackReference
+    public Post getParent() {
+        return parent;
+    }
+
+    public void setParent(Post parent) {
+        this.parent = parent;
+    }
+
+    @JsonManagedReference
+    public List<Post> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Post> children) {
+        this.children = children;
+    }
+
+    public Post(Long postId, String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited, Integer upvoteCount, Integer downvoteCount, Post parent,
+            List<Post> children) {
+        this.postId = postId;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.timePosted = timePosted;
+        this.timeLastEdited = timeLastEdited;
+        this.upvoteCount = upvoteCount;
+        this.downvoteCount = downvoteCount;
+        this.parent = parent;
+        this.children = children;
+    }
+    
+}

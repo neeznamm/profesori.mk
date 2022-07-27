@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -38,6 +39,9 @@ public class StudyProgramme {
     @OneToMany(mappedBy = "studyProgramme")
     private Set<Subject> subjects = new HashSet<>();
 
+    @OneToOne(mappedBy = "relatedStudyProgramme")
+    private Section relatedSection;
+
     //getters
     public Long getStudyProgrammeId() {
         return studyProgrammeId;
@@ -59,5 +63,10 @@ public class StudyProgramme {
     @JsonManagedReference
     public Set<Subject> getSubjects() {
         return subjects;
+    }
+
+    @JsonManagedReference
+    public Section getRelatedSection() {
+        return relatedSection;
     }
 }
