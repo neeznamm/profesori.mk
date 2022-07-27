@@ -37,22 +37,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public String signUp(CustomUserDetails customUserDetails) {
-
-        boolean emailExists = userRepository.findByEmail(customUserDetails.getEmail()).isPresent();
-        if(emailExists) {
-            throw new IllegalStateException("Email is taken");
-        }
-
-        boolean usernameExists = userRepository.findByUsername(customUserDetails.getUsername()).isPresent();
-        if(usernameExists) {
-            throw new IllegalStateException("Username is taken");
-        }
-
         String encodedPassword = passwordEncoder().encode(customUserDetails.getPassword());
         customUserDetails.setPassword(encodedPassword);
 
         userRepository.save(customUserDetails);
 
+        String token = createToken(customUserDetails);
+
+        return token;
+    }
+
+    public String createToken(CustomUserDetails customUserDetails) {
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = new ConfirmationToken(
             token,
