@@ -14,11 +14,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "study_programme")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "studyProgrammeId")
 public class StudyProgramme {
 
     @Id
@@ -42,7 +43,7 @@ public class StudyProgramme {
     @OneToOne(mappedBy = "relatedStudyProgramme")
     private Section relatedSection;
 
-    //getters
+    // getters
     public Long getStudyProgrammeId() {
         return studyProgrammeId;
     }
@@ -55,17 +56,14 @@ public class StudyProgramme {
         return cycle;
     }
 
-    @JsonBackReference
     public Faculty getFaculty() {
         return faculty;
     }
 
-    @JsonManagedReference
     public Set<Subject> getSubjects() {
         return subjects;
     }
 
-    @JsonManagedReference
     public Section getRelatedSection() {
         return relatedSection;
     }

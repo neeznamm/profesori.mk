@@ -11,8 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @DiscriminatorValue("thread")
 public class _Thread extends Post {
@@ -38,19 +36,17 @@ public class _Thread extends Post {
         this.targetSubject = targetSubject;
     }
 
-    //getters
+    // getters
     public List<String> getTags() {
         return tags;
     }
 
-    @JsonBackReference
     public Section getParentSection() {
         return parentSection;
     }
 
-    @JsonBackReference
     public Subject getTargetSubject() {
         return targetSubject;
     }
-    
+
 }

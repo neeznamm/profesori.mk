@@ -11,10 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "city")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId")
 public class City {
 
     @Id
@@ -28,7 +30,7 @@ public class City {
     @OneToMany(mappedBy = "city")
     private Set<University> universities = new HashSet<>();
 
-    //getters
+    // getters
     public Long getCityId() {
         return cityId;
     }
@@ -37,9 +39,8 @@ public class City {
         return cityName;
     }
 
-    @JsonManagedReference
     public Set<University> getUniversities() {
         return universities;
     }
-    
+
 }

@@ -21,7 +21,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,13 +34,14 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class CustomUserDetails implements UserDetails {
 
     @Id
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
     private Long id;
-    private String fullName; //opcionalno, smee da e prazno
+    private String fullName; // opcionalno, smee da e prazno
     private String username;
     private String email;
     private String password;
@@ -96,9 +98,8 @@ public class CustomUserDetails implements UserDetails {
         return enabled;
     }
 
-    @JsonManagedReference
     List<Post> getAuthoredPosts() {
         return this.authoredPosts;
     }
-    
+
 }

@@ -1,10 +1,7 @@
 package mk.profesori.springapp.Model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,11 +13,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "professor")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "professorId")
 public class Professor {
 
     @Id
@@ -38,7 +36,7 @@ public class Professor {
     @OneToMany(mappedBy = "targetProfessor", cascade = CascadeType.ALL)
     private List<Opinion> relatedOpinions = new ArrayList<Opinion>();
 
-    //getters
+    // getters
     public Long getProfessorId() {
         return professorId;
     }
@@ -47,12 +45,10 @@ public class Professor {
         return professorName;
     }
 
-    @JsonBackReference
     public Faculty getFaculty() {
         return faculty;
     }
 
-    @JsonManagedReference
     public List<Opinion> getRelatedOpinions() {
         return relatedOpinions;
     }

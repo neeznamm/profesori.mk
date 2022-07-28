@@ -1,10 +1,7 @@
 package mk.profesori.springapp.Model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,11 +13,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "subject")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "subjectId")
 public class Subject {
 
     @Id
@@ -38,7 +36,7 @@ public class Subject {
     @OneToMany(mappedBy = "targetSubject", cascade = CascadeType.ALL)
     private List<_Thread> threads = new ArrayList<>();
 
-    //getters
+    // getters
     public Long getSubjectId() {
         return subjectId;
     }
@@ -47,14 +45,12 @@ public class Subject {
         return subjectName;
     }
 
-    @JsonBackReference
     public StudyProgramme getStudyProgramme() {
         return studyProgramme;
     }
 
-    @JsonManagedReference
     public List<_Thread> getThreads() {
         return threads;
     }
-    
+
 }

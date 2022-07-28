@@ -8,11 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @DiscriminatorValue("opinion")
-public class Opinion extends Post{
+public class Opinion extends Post {
 
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
@@ -25,8 +23,7 @@ public class Opinion extends Post{
         this.targetProfessor = targetProfessor;
     }
 
-    //getters and setters
-    @JsonBackReference
+    // getters and setters
     public Professor getTargetProfessor() {
         return targetProfessor;
     }

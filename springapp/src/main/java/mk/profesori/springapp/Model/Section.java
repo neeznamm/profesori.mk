@@ -13,12 +13,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "sectionId")
 public class Section {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -34,7 +35,7 @@ public class Section {
     @JoinColumn(name = "study_programme_id", referencedColumnName = "id")
     private StudyProgramme relatedStudyProgramme;
 
-    //getters and setters
+    // getters and setters
     public Long getSectionId() {
         return sectionId;
     }
@@ -43,7 +44,6 @@ public class Section {
         this.sectionId = sectionId;
     }
 
-    @JsonManagedReference
     public List<_Thread> getThreads() {
         return threads;
     }
@@ -52,7 +52,6 @@ public class Section {
         this.threads = threads;
     }
 
-    @JsonBackReference
     public StudyProgramme getRelatedStudyProgramme() {
         return relatedStudyProgramme;
     }
@@ -66,5 +65,5 @@ public class Section {
         this.threads = threads;
         this.relatedStudyProgramme = relatedStudyProgramme;
     }
-    
+
 }

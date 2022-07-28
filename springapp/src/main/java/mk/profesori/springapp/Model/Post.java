@@ -18,30 +18,30 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-@Entity(name="post")
+@Entity(name = "post")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="post_type", 
-  discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "post_type", discriminatorType = DiscriminatorType.STRING)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "postId")
 public class Post {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long postId;
-    
+
     @Column(name = "title")
     private String title;
 
-    @Column(name = "content", columnDefinition="TEXT")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
-    
+
     @ManyToOne
     @JoinColumn(name = "custom_user_details_id")
     private CustomUserDetails author;
-    
+
     @Column(name = "time_posted")
     private LocalDateTime timePosted;
 
@@ -57,11 +57,11 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "parent_post_id", nullable = true)
     private Post parent;
-    
+
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Post> children = new ArrayList<>();
 
-    //getters and setters
+    // getters and setters
     public Long getPostId() {
         return postId;
     }
@@ -85,8 +85,7 @@ public class Post {
     public void setContent(String content) {
         this.content = content;
     }
-    
-    @JsonBackReference
+
     public CustomUserDetails getAuthor() {
         return author;
     }
@@ -127,7 +126,6 @@ public class Post {
         this.downvoteCount = downvoteCount;
     }
 
-    @JsonBackReference
     public Post getParent() {
         return parent;
     }
@@ -136,7 +134,6 @@ public class Post {
         this.parent = parent;
     }
 
-    @JsonManagedReference
     public List<Post> getChildren() {
         return children;
     }
@@ -159,5 +156,5 @@ public class Post {
         this.parent = parent;
         this.children = children;
     }
-    
+
 }
