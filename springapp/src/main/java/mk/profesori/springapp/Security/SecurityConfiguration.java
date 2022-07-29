@@ -11,14 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import lombok.RequiredArgsConstructor;
-import mk.profesori.springapp.Service.CustomUserDetailsService;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfiguration {
-
-    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -34,14 +31,16 @@ public class SecurityConfiguration {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .httpBasic() // neenkriptirani credentials osven ako ne e preky https/tls
+                .and()
                 .cors()
                 .and()
                 .csrf().disable() // PRIVREMENO
                 .authorizeRequests()
-                .antMatchers("/registration/**")
-                .permitAll()
-                .anyRequest()
-                .permitAll().and() // bese .authenticated()
+                .antMatchers("/secure/**").hasAnyAuthority("REGULAR", "MODERATOR")
+                .antMatchers("/public/**").permitAll()
+                .antMatchers("/registration/**").permitAll()
+                .and()
                 .formLogin();
 
         return http.build();

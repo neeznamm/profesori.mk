@@ -8,18 +8,30 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.NoArgsConstructor;
+
 @Entity
 @DiscriminatorValue("opinion")
+@NoArgsConstructor
 public class Opinion extends Post {
 
     @ManyToOne
-    @JoinColumn(name = "professor_id", nullable = false)
+    @JoinColumn(name = "professor_id")
     private Professor targetProfessor;
 
-    public Opinion(Long postId, String title, String content, CustomUserDetails author, LocalDateTime timePosted,
-            LocalDateTime timeLastEdited, Integer upvoteCount, Integer downvoteCount, Post parent,
-            List<Post> children, Professor targetProfessor) {
-        super(postId, title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, parent, children);
+    // konstruktor so parent (koga e reply)
+    public Opinion(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited,
+            Integer upvoteCount, Integer downvoteCount, Post parent, List<Post> children, Professor targetProfessor) {
+        super(title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, parent, children);
+        this.targetProfessor = targetProfessor;
+    }
+
+    // konstruktor bez parent (koga NE e reply)
+    public Opinion(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited,
+            Integer upvoteCount, Integer downvoteCount, List<Post> children, Professor targetProfessor) {
+        super(title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, children);
         this.targetProfessor = targetProfessor;
     }
 

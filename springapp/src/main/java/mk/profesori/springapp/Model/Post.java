@@ -21,10 +21,13 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import lombok.NoArgsConstructor;
+
 @Entity(name = "post")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "post_type", discriminatorType = DiscriminatorType.STRING)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "postId")
+@NoArgsConstructor
 public class Post {
 
     @Id
@@ -142,19 +145,34 @@ public class Post {
         this.children = children;
     }
 
-    public Post(Long postId, String title, String content, CustomUserDetails author, LocalDateTime timePosted,
-            LocalDateTime timeLastEdited, Integer upvoteCount, Integer downvoteCount, Post parent,
-            List<Post> children) {
-        this.postId = postId;
+    // konstruktor so parent (koga e reply)
+    public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited,
+            Integer upvoteCount, Integer downvoteCount, Post parent, List<Post> children) {
         this.title = title;
         this.content = content;
         this.author = author;
-        this.timePosted = timePosted;
-        this.timeLastEdited = timeLastEdited;
-        this.upvoteCount = upvoteCount;
-        this.downvoteCount = downvoteCount;
+        this.timePosted = LocalDateTime.now();
+        this.timeLastEdited = LocalDateTime.now();
+        this.upvoteCount = 0;
+        this.downvoteCount = 0;
         this.parent = parent;
-        this.children = children;
+        this.children = new ArrayList<>();
+    }
+
+    // konstruktor bez parent (koga NE e reply)
+    public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited,
+            Integer upvoteCount, Integer downvoteCount, List<Post> children) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.timePosted = LocalDateTime.now();
+        this.timeLastEdited = LocalDateTime.now();
+        this.upvoteCount = 0;
+        this.downvoteCount = 0;
+        this.parent = null;
+        this.children = new ArrayList<>();
     }
 
 }

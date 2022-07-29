@@ -1,6 +1,5 @@
 package mk.profesori.springapp.Model;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +26,16 @@ public class _Thread extends Post {
     @JoinColumn(name = "subject_id")
     private Subject targetSubject;
 
-    public _Thread(Long postId, String title, String content, CustomUserDetails author, LocalDateTime timePosted,
-            LocalDateTime timeLastEdited, Integer upvoteCount, Integer downvoteCount, Post parent,
-            List<Post> children, List<String> tags, Section parentSection, Subject targetSubject) {
-        super(postId, title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, parent, children);
-        this.tags = tags;
-        this.parentSection = parentSection;
-        this.targetSubject = targetSubject;
-    }
+    // TODO
+    /*
+     * public _Thread(String title, String content, List<String> tags, Section
+     * parentSection, Subject targetSubject) {
+     * super(title, content);
+     * this.tags = tags;
+     * this.parentSection = parentSection;
+     * this.targetSubject = targetSubject;
+     * }
+     */
 
     // getters
     public List<String> getTags() {
