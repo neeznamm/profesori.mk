@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
+import OpinionTree from "../Components/OpinionTree";
 
-function Professor() {
+function Professor(props) {
   let params = useParams();
 
   let [professor, setProfessor] = useState(null);
@@ -17,7 +18,7 @@ function Professor() {
         setProfessor(json);
         setLoaded(true);
       } catch (error) {
-        console.log("error", error);
+        console.log("Error", error);
       }
     };
 
@@ -27,8 +28,12 @@ function Professor() {
   if (loaded) {
     return (
       <div>
-        <div>{professor.professorName}</div>
-        <div>{professor.faculty.facultyName}</div>
+        <h2>{professor.professorName}</h2>
+        <h3>{professor.faculty.facultyName}</h3>
+        <h3>Мислења</h3>
+        <div className="opinionTree">
+          <OpinionTree professor={professor} />
+        </div>
         <Outlet />
       </div>
     );
