@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const ProfessorCard = styled.div`
   background-color: papayawhip;
-  width: fit-content;
+  width: auto;
   padding: 10px;
   margin-bottom: 30px;
 `;

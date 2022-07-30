@@ -40,12 +40,18 @@ function OpinionTree({ professor }) {
             <StyledFontAwesomeIcon
               icon={solid("thumbs-up")}
               right={50 + "px"}
+              color="greenyellow"
             />
             <StyledFontAwesomeIcon
               icon={solid("thumbs-down")}
               right={10 + "px"}
+              color="indianred"
             />
-            <StyledFontAwesomeIcon icon={solid("reply")} right={90 + "px"} />
+            <StyledFontAwesomeIcon
+              icon={solid("reply")}
+              right={90 + "px"}
+              color="black"
+            />
           </OpinionReplyCardContent>
           {child.children.map((childOfChild) =>
             displayChildPosts(
@@ -83,14 +89,17 @@ function OpinionTree({ professor }) {
                   <StyledFontAwesomeIcon
                     icon={solid("thumbs-up")}
                     right={50 + "px"}
+                    color="greenyellow"
                   />
                   <StyledFontAwesomeIcon
                     icon={solid("thumbs-down")}
                     right={10 + "px"}
+                    color="indianred"
                   />
                   <StyledFontAwesomeIcon
                     icon={solid("reply")}
                     right={90 + "px"}
+                    color="black"
                   />
                 </OpinionCardContent>
                 {opinion.children.map((child) =>

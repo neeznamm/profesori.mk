@@ -56,5 +56,9 @@ export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: ${(props) => props.indent};
+  right: ${(props) => props.right};
+  transition: 0.5s;
+  &:hover {
+    color: ${(props) => props.color};
+  }
 `;
