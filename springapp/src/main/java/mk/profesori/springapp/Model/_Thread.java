@@ -26,7 +26,7 @@ public class _Thread extends Post {
     @JoinColumn(name = "subject_id")
     private Subject targetSubject;
 
-    // TODO
+    // TODO threadovi
     /*
      * public _Thread(String title, String content, List<String> tags, Section
      * parentSection, Subject targetSubject) {

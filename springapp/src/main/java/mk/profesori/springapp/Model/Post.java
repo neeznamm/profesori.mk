@@ -19,14 +19,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
 
 import lombok.NoArgsConstructor;
 
 @Entity(name = "post")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "post_type", discriminatorType = DiscriminatorType.STRING)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "postId")
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 @NoArgsConstructor
 public class Post {
 

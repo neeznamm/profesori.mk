@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
+import JSOG from "jsog";
 import OpinionTree from "../Components/OpinionTree";
 
 function Professor(props) {
@@ -14,8 +15,10 @@ function Professor(props) {
     const fetchData = async () => {
       try {
         const response = await fetch(url);
-        const json = await response.json();
-        setProfessor(json);
+        var cyclicGraph = await response.json();
+        var jsogStructure = JSOG.encode(cyclicGraph); // has { '@ref': 'ID' } links instead of cycles
+        cyclicGraph = JSOG.decode(jsogStructure);
+        setProfessor(cyclicGraph);
         setLoaded(true);
       } catch (error) {
         console.log("Error", error);

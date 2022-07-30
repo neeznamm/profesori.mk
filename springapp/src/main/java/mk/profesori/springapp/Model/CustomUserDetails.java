@@ -22,7 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,7 +34,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 public class CustomUserDetails implements UserDetails {
 
     @Id
@@ -44,7 +44,7 @@ public class CustomUserDetails implements UserDetails {
     private String fullName; // opcionalno, smee da e prazno
     private String username;
     private String email;
-    private String password;
+    private String password; // TODO dont expose password in api
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private Boolean locked = false;
