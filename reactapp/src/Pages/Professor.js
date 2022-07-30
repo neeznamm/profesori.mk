@@ -2,6 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import JSOG from "jsog";
 import OpinionTree from "../Components/OpinionTree";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  solid,
+  regular,
+  brands,
+} from "@fortawesome/fontawesome-svg-core/import.macro";
+
+import {
+  ProfessorCard,
+  ProfessorCardDetails,
+  ProfessorCardName,
+  ProfessorCardSeparator,
+} from "../Components/ProfessorCard.style";
 
 function Professor(props) {
   let params = useParams();
@@ -31,9 +44,19 @@ function Professor(props) {
   if (loaded) {
     return (
       <div>
-        <h2>{professor.professorName}</h2>
-        <h3>{professor.faculty.facultyName}</h3>
-        <h3>Мислења</h3>
+        <ProfessorCard>
+          <ProfessorCardName>{professor.professorName}</ProfessorCardName>
+          <ProfessorCardSeparator />
+          <div style={{ marginTop: "20px" }}>
+            <ProfessorCardDetails fontSize="20px">
+              {professor.faculty.facultyName}
+            </ProfessorCardDetails>
+            <ProfessorCardDetails fontSize="15px">
+              {professor.faculty.university.universityName}
+            </ProfessorCardDetails>
+          </div>
+        </ProfessorCard>
+        <h3>{professor.relatedOpinions.length} мислења</h3>
         <div className="opinionTree">
           <OpinionTree professor={professor} />
         </div>
