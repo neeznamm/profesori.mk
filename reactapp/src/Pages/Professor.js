@@ -56,7 +56,10 @@ function Professor(props) {
             </ProfessorCardDetails>
           </div>
         </ProfessorCard>
-        <h3>{professor.relatedOpinions.length} мислења</h3>
+        <h3 style={{ marginBottom: "10px" }}>
+          {professor.relatedOpinions.length}{" "}
+          {professor.relatedOpinions.length !== 1 ? "мислења" : "мислење"}
+        </h3>
         <div className="opinionTree">
           <OpinionTree professor={professor} />
         </div>

@@ -1,4 +1,19 @@
-import { OpinionCard, OpinionReplyCard } from "./OpinionCard.style";
+import {
+  OpinionCard,
+  OpinionCardContent,
+  OpinionCardContentTime,
+  OpinionCardContentTitle,
+  OpinionReplyCard,
+  OpinionReplyCardContent,
+  OpinionReplyCardContentTime,
+  StyledFontAwesomeIcon,
+} from "./OpinionCard.style";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  solid,
+  regular,
+  brands,
+} from "@fortawesome/fontawesome-svg-core/import.macro";
 import { dateConverter } from "../Util/dateConverter";
 
 function OpinionTree({ professor }) {
@@ -11,22 +26,35 @@ function OpinionTree({ professor }) {
     return (
       <div key={child.postId}>
         <OpinionReplyCard indent={replyIndent + "px"}>
-          <p>
-            <a href="#">{child.author.username}</a> му реплицирал на{" "}
-            {parentPostAuthorUsername}
-          </p>
-          <p>{child.content}</p>
-          <p>
-            {dateConverter(new Date(child.timePosted).toString().slice(4, -43))}
-          </p>
+          <OpinionReplyCardContent>
+            <p>
+              <a href="#">{child.author.username}</a> му реплицирал на{" "}
+              {parentPostAuthorUsername}
+            </p>
+            <p>{child.content}</p>
+            <OpinionReplyCardContentTime>
+              {dateConverter(
+                new Date(child.timePosted).toString().slice(4, -43)
+              )}
+            </OpinionReplyCardContentTime>
+            <StyledFontAwesomeIcon
+              icon={solid("thumbs-up")}
+              right={50 + "px"}
+            />
+            <StyledFontAwesomeIcon
+              icon={solid("thumbs-down")}
+              right={10 + "px"}
+            />
+            <StyledFontAwesomeIcon icon={solid("reply")} right={90 + "px"} />
+          </OpinionReplyCardContent>
+          {child.children.map((childOfChild) =>
+            displayChildPosts(
+              childOfChild,
+              child.author.username,
+              replyIndent + 30
+            )
+          )}
         </OpinionReplyCard>
-        {child.children.map((childOfChild) =>
-          displayChildPosts(
-            childOfChild,
-            child.author.username,
-            replyIndent + 30
-          )
-        )}
       </div>
     );
   }
@@ -36,25 +64,39 @@ function OpinionTree({ professor }) {
       {professor.relatedOpinions.map((opinion) => {
         if (!renderedOpinionIds.includes(opinion.postId)) {
           postCount = renderedOpinionIds.push(opinion.postId);
-          var replyIndent = 30;
           return (
             <div key={opinion.postId}>
               <OpinionCard>
-                <p>
-                  <a href="#">{opinion.author.username}</a> напишал
-                </p>
-
-                <p>{opinion.title}</p>
-                <p>{opinion.content}</p>
-                <p>
-                  {dateConverter(
-                    new Date(opinion.timePosted).toString().slice(4, -43)
-                  )}
-                </p>
+                <OpinionCardContent>
+                  <p>
+                    <a href="#">{opinion.author.username}</a> напишал
+                  </p>
+                  <OpinionCardContentTitle>
+                    {opinion.title}
+                  </OpinionCardContentTitle>
+                  <p>{opinion.content}</p>
+                  <OpinionCardContentTime>
+                    {dateConverter(
+                      new Date(opinion.timePosted).toString().slice(4, -43)
+                    )}
+                  </OpinionCardContentTime>
+                  <StyledFontAwesomeIcon
+                    icon={solid("thumbs-up")}
+                    right={50 + "px"}
+                  />
+                  <StyledFontAwesomeIcon
+                    icon={solid("thumbs-down")}
+                    right={10 + "px"}
+                  />
+                  <StyledFontAwesomeIcon
+                    icon={solid("reply")}
+                    right={90 + "px"}
+                  />
+                </OpinionCardContent>
+                {opinion.children.map((child) =>
+                  displayChildPosts(child, opinion.author.username, 30)
+                )}
               </OpinionCard>
-              {opinion.children.map((child) =>
-                displayChildPosts(child, opinion.author.username, replyIndent)
-              )}
             </div>
           );
         }
