@@ -1,19 +1,32 @@
-import { OpinionCard } from "./OpinionCard.style";
+import { OpinionCard, OpinionReplyCard } from "./OpinionCard.style";
+import { dateConverter } from "../Util/dateConverter";
 
 function OpinionTree({ professor }) {
   var renderedOpinionIds = [];
   var postCount; // za da ne go pokazuva ispod postot
 
-  function displayChildPosts(child) {
+  function displayChildPosts(child, parentPostAuthorUsername, replyIndent) {
     if (child == null) return;
     postCount = renderedOpinionIds.push(child.postId);
     return (
       <div key={child.postId}>
-        <p>
-          <a href="#">{child.author.username}</a> реплицирал
-        </p>
-        <p>Содржина: {child.content}</p>
-        {child.children.map((childOfChild) => displayChildPosts(childOfChild))}
+        <OpinionReplyCard indent={replyIndent + "px"}>
+          <p>
+            <a href="#">{child.author.username}</a> му реплицирал на{" "}
+            {parentPostAuthorUsername}
+          </p>
+          <p>{child.content}</p>
+          <p>
+            {dateConverter(new Date(child.timePosted).toString().slice(4, -43))}
+          </p>
+        </OpinionReplyCard>
+        {child.children.map((childOfChild) =>
+          displayChildPosts(
+            childOfChild,
+            child.author.username,
+            replyIndent + 30
+          )
+        )}
       </div>
     );
   }
@@ -23,6 +36,7 @@ function OpinionTree({ professor }) {
       {professor.relatedOpinions.map((opinion) => {
         if (!renderedOpinionIds.includes(opinion.postId)) {
           postCount = renderedOpinionIds.push(opinion.postId);
+          var replyIndent = 30;
           return (
             <div key={opinion.postId}>
               <OpinionCard>
@@ -32,9 +46,15 @@ function OpinionTree({ professor }) {
 
                 <p>{opinion.title}</p>
                 <p>{opinion.content}</p>
-                <p>{Date(opinion.timePosted)}</p>
+                <p>
+                  {dateConverter(
+                    new Date(opinion.timePosted).toString().slice(4, -43)
+                  )}
+                </p>
               </OpinionCard>
-              {opinion.children.map((child) => displayChildPosts(child))}
+              {opinion.children.map((child) =>
+                displayChildPosts(child, opinion.author.username, replyIndent)
+              )}
             </div>
           );
         }

@@ -47,7 +47,7 @@ function Professor(props) {
         <ProfessorCard>
           <ProfessorCardName>{professor.professorName}</ProfessorCardName>
           <ProfessorCardSeparator />
-          <div style={{ marginTop: "20px" }}>
+          <div style={{ marginTop: "10px" }}>
             <ProfessorCardDetails fontSize="20px">
               {professor.faculty.facultyName}
             </ProfessorCardDetails>
