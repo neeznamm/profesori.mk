@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { MainWrapper, MainTitle } from "./Components/Main.style";
+import Search from "./Components/Search.js";
 
 export default function App() {
   //document.body.style = "background: red;";
@@ -15,6 +16,7 @@ export default function App() {
         }
       </style>
       <MainTitle>profesori.mk</MainTitle>
+      <Search />
       <Outlet />
     </MainWrapper>
   );
