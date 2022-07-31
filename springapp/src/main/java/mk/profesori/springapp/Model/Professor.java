@@ -14,11 +14,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
 
 @Entity
 @Table(name = "professor")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "professorId")
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 public class Professor {
 
     @Id
