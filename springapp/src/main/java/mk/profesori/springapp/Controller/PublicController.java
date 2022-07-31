@@ -2,17 +2,13 @@ package mk.profesori.springapp.Controller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import mk.profesori.springapp.Model.City;
@@ -20,9 +16,7 @@ import mk.profesori.springapp.Model.Faculty;
 import mk.profesori.springapp.Model.Professor;
 import mk.profesori.springapp.Model.StudyProgramme;
 import mk.profesori.springapp.Model.University;
-import mk.profesori.springapp.Repository.ProfessorRepository;
 import mk.profesori.springapp.Service.MainService;
-import mk.profesori.springapp.Service.Search.ProfessorSpecificationsBuilder;
 
 @RestController
 @RequestMapping("/public")
@@ -32,33 +26,19 @@ public class PublicController {
     @Autowired
     private MainService mainService;
 
-    @Autowired
-    private ProfessorRepository professorRepository;
-
-    /*
-     * @RequestMapping(value = "/professors", method = RequestMethod.GET)
-     * public List<Professor> getProfessorsByFaculty(@RequestParam Optional<Long>
-     * facultyId) {
-     * 
-     * if (!facultyId.isPresent())
-     * return mainService.getAllProfessors(); // ako nema parametar facultyId gi
-     * vrakja site profesori
-     * return mainService.getProfessorsByFacultyId(facultyId.get());
-     * }
-     */
-
     @RequestMapping(value = "/professors", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Professor> search(@RequestParam(value = "search") String search) {
-        ProfessorSpecificationsBuilder builder = new ProfessorSpecificationsBuilder();
-        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),", Pattern.UNICODE_CHARACTER_CLASS);
-        Matcher matcher = pattern.matcher(search + ",");
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
-        }
+    public List<Professor> getProfessorsByFaculty(@RequestParam Optional<Long> facultyId) {
 
-        Specification<Professor> spec = builder.build();
-        return professorRepository.findAll(spec);
+        if (!facultyId.isPresent())
+            return mainService.getAllProfessors(); // ako nema parametar facultyId gi vrakja site profesori
+
+        return mainService.getProfessorsByFacultyId(facultyId.get());
+    }
+
+    @RequestMapping(value = "/professors/nameContains/{contained}", method = RequestMethod.GET)
+    public List<Professor> getProfessorsByNameContains(@PathVariable String contained) {
+        return mainService.getProfessorsByNameContains(contained); // vrakja profesori sto sodrzat "contained" vo
+                                                                   // professorName
     }
 
     @RequestMapping(value = "/professor/{professorId}", method = RequestMethod.GET)

@@ -57,6 +57,12 @@ public class MainService {
         return list;
     }
 
+    public List<Professor> getProfessorsByNameContains(String contained) {
+        List<Professor> list = new ArrayList<>();
+        professorRepository.findByProfessorNameContainingIgnoreCase(contained).forEach(list::add);
+        return list;
+    }
+
     public List<StudyProgramme> getAllStudyProgrammes() {
 
         List<StudyProgramme> list = new ArrayList<>();

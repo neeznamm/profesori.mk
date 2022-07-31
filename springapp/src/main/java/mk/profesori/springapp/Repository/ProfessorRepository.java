@@ -17,4 +17,6 @@ public interface ProfessorRepository extends CrudRepository<Professor, Long>, Jp
     public Professor findByProfessorId(Long id);
 
     public List<Professor> findByFaculty(Faculty faculty);
+
+    public List<Professor> findByProfessorNameContainingIgnoreCase(String name);
 }
