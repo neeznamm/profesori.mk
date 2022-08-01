@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import JSOG from "jsog";
 import OpinionTree from "../Components/OpinionTree";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  solid,
-  regular,
-  brands,
-} from "@fortawesome/fontawesome-svg-core/import.macro";
 
 import {
   ProfessorCard,
@@ -69,7 +63,7 @@ function Professor(props) {
   } else {
     return (
       <div>
-        <p>loading</p>
+        <p style={{ marginTop: "140px" }}>се вчитува...</p>
         <Outlet />
       </div>
     );

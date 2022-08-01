@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import JSOG from "jsog";
 import { transliterate } from "../Util/transliterate";
 import {
-  SearchDropdownContentSmall,
+  SearchDropdownResultSmall,
+  SearchDropdownTextSmall,
   SearchDropdownSmall,
+  SearchDropdownResultLinkSmall,
+  SearchSmall,
 } from "./Search.style";
 function Search() {
   const [query, setQuery] = useState("");
@@ -31,25 +34,36 @@ function Search() {
   }, [query]);
 
   return (
-    <div style={{ position: "relative" }}>
-      <input
+    <div
+      style={{
+        position: "relative",
+        width: "fit-content",
+        float: "right",
+      }}
+    >
+      <SearchSmall
         placeholder="Пребарувај..."
         onChange={(e) => setQuery(e.target.value)}
       />
-
-      {query.length > 2 &&
-        professors.slice(0, 10).map((professor) => (
-          <SearchDropdownSmall>
-            <div key={professor.professorId}>
-              <SearchDropdownContentSmall weight="bold" size="medium">
-                {professor.professorName}
-              </SearchDropdownContentSmall>
-              <SearchDropdownContentSmall weight="normal" size="smaller">
-                {professor.faculty.facultyName}
-              </SearchDropdownContentSmall>
-            </div>
-          </SearchDropdownSmall>
-        ))}
+      <SearchDropdownSmall
+        display={query.length > 2 && professors.length > 0 ? "block" : "none"}
+      >
+        {query.length > 2 &&
+          professors.slice(0, 7).map((professor) => (
+            <SearchDropdownResultSmall key={professor.professorId}>
+              <SearchDropdownResultLinkSmall
+                href={"/professor/" + professor.professorId}
+              >
+                <SearchDropdownTextSmall weight="bold" size="medium">
+                  {professor.professorName}
+                </SearchDropdownTextSmall>
+                <SearchDropdownTextSmall weight="normal" size="smaller">
+                  {professor.faculty.facultyName}
+                </SearchDropdownTextSmall>
+              </SearchDropdownResultLinkSmall>
+            </SearchDropdownResultSmall>
+          ))}
+      </SearchDropdownSmall>
     </div>
   );
 }

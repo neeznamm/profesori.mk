@@ -15,8 +15,7 @@ export default function App() {
           "body { background-color: papayawhip;} * {margin: 0; padding: 0; box-sizing: border-box;}"
         }
       </style>
-      <MainTitle>profesori.mk</MainTitle>
-      <Search />
+      <MainTitle>profesori.mk</MainTitle> <Search />
       <Outlet />
     </MainWrapper>
   );

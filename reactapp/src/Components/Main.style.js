@@ -16,4 +16,6 @@ export const MainTitle = styled.h1`
   font-size: 36pt;
   text-decoration: underline 3px;
   margin-bottom: 30px;
+  width: fit-content;
+  float: left;
 `;
