@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { MainWrapper, MainTitle } from "./Components/Main.style";
+import { MainWrapper, MainTitle } from "./Components/Styled/Main.style";
 import Search from "./Components/Search.js";
 
 export default function App() {
@@ -15,7 +15,10 @@ export default function App() {
           "body { background-color: papayawhip;} * {margin: 0; padding: 0; box-sizing: border-box;}"
         }
       </style>
-      <MainTitle>profesori.mk</MainTitle> <Search />
+      <a href="/">
+        <MainTitle>profesori.mk</MainTitle>
+      </a>{" "}
+      <Search />
       <Outlet />
     </MainWrapper>
   );

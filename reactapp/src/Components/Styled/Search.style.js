@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import searchicon from "../searchicon.png";
+import searchicon from "../../searchicon.png";
 
-export const SearchSmall = styled.input`
+export const SearchBox = styled.input`
   width: 350px;
   box-sizing: border-box;
   border: 2px solid #ccc;
@@ -14,7 +14,7 @@ export const SearchSmall = styled.input`
   margin-top: 10px;
 `;
 
-export const SearchDropdownSmall = styled.div`
+export const SearchDropdown = styled.div`
   display: ${(props) => props.display};
   position: absolute;
   background-color: #f9f9f9;
@@ -26,21 +26,27 @@ export const SearchDropdownSmall = styled.div`
   padding: 0;
 `;
 
-export const SearchDropdownResultSmall = styled.div`
+export const SearchResult = styled.div`
   &:hover {
     background-color: papayawhip;
     border: 1px solid blue;
     text-decoration: underline 1px blue;
   }
   padding: 10px;
+  border: 1px solid transparent;
+  margin: ${(props) => props.margin};
 `;
 
-export const SearchDropdownResultLinkSmall = styled.a`
+export const SearchResultLink = styled.a`
   text-decoration: none;
   color: black;
 `;
 
-export const SearchDropdownTextSmall = styled.p`
+export const SearchResultText = styled.p`
   font-weight: ${(props) => props.weight};
   font-size: ${(props) => props.size};
+`;
+
+export const SearchResultsWrapper = styled.div`
+  margin-top: 140px;
 `;

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import JSOG from "jsog";
 import { transliterate } from "../Util/transliterate";
 import {
-  SearchDropdownResultSmall,
-  SearchDropdownTextSmall,
-  SearchDropdownSmall,
-  SearchDropdownResultLinkSmall,
-  SearchSmall,
-} from "./Search.style";
+  SearchResult,
+  SearchResultText,
+  SearchDropdown,
+  SearchResultLink,
+  SearchBox,
+} from "./Styled/Search.style";
+import { useNavigate } from "react-router";
 function Search() {
   const [query, setQuery] = useState("");
   const [professors, setProfessors] = useState([]);
@@ -26,12 +27,31 @@ function Search() {
         setProfessors(cyclicGraph);
         //setLoaded(true);
       } catch (error) {
-        console.log("Error", error);
+        console.log("Fetching error occured", error);
       }
     };
 
     if (query.length > 2) fetchData();
   }, [query]);
+
+  const navigate = useNavigate();
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      setExpanded(false);
+      navigate("/search", { state: professors });
+    }
+  };
+
+  const [expanded, setExpanded] = useState(false);
+
+  function expand() {
+    setExpanded(true);
+  }
+
+  function close() {
+    setExpanded(false);
+  }
 
   return (
     <div
@@ -41,29 +61,42 @@ function Search() {
         float: "right",
       }}
     >
-      <SearchSmall
+      <SearchBox
         placeholder="Пребарувај..."
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        onFocus={expand}
+        onBlur={close}
       />
-      <SearchDropdownSmall
-        display={query.length > 2 && professors.length > 0 ? "block" : "none"}
+      <SearchDropdown
+        display={
+          query.length > 2 && professors.length > 0 && expanded
+            ? "block"
+            : "none"
+        }
       >
         {query.length > 2 &&
           professors.slice(0, 7).map((professor) => (
-            <SearchDropdownResultSmall key={professor.professorId}>
-              <SearchDropdownResultLinkSmall
-                href={"/professor/" + professor.professorId}
-              >
-                <SearchDropdownTextSmall weight="bold" size="medium">
+            <SearchResult
+              key={professor.professorId}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+              margin="0"
+            >
+              <SearchResultLink href={"/professor/" + professor.professorId}>
+                <SearchResultText weight="bold" size="medium">
                   {professor.professorName}
-                </SearchDropdownTextSmall>
-                <SearchDropdownTextSmall weight="normal" size="smaller">
+                </SearchResultText>
+                <SearchResultText weight="normal" size="er">
                   {professor.faculty.facultyName}
-                </SearchDropdownTextSmall>
-              </SearchDropdownResultLinkSmall>
-            </SearchDropdownResultSmall>
+                </SearchResultText>
+              </SearchResultLink>
+            </SearchResult>
           ))}
-      </SearchDropdownSmall>
+      </SearchDropdown>
     </div>
   );
 }

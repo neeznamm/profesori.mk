@@ -8,7 +8,7 @@ import {
   ProfessorCardDetails,
   ProfessorCardName,
   ProfessorCardSeparator,
-} from "../Components/ProfessorCard.style";
+} from "../Components/Styled/ProfessorCard.style";
 
 function Professor(props) {
   let params = useParams();
@@ -33,7 +33,7 @@ function Professor(props) {
     };
 
     fetchData();
-  }, []);
+  }, [params.professorId]);
 
   if (loaded) {
     return (

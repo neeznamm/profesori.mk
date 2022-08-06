@@ -7,13 +7,9 @@ import {
   OpinionReplyCardContent,
   OpinionReplyCardContentTime,
   StyledFontAwesomeIcon,
-} from "./OpinionCard.style";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  solid,
-  regular,
-  brands,
-} from "@fortawesome/fontawesome-svg-core/import.macro";
+} from "./Styled/OpinionCard.style";
+
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { dateConverter } from "../Util/dateConverter";
 
 function OpinionTree({ professor }) {
