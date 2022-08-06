@@ -5,6 +5,7 @@ export const ProfessorCard = styled.div`
   width: auto;
   padding: 10px;
   margin-bottom: 30px;
+  margin-top: 140px;
 `;
 
 export const ProfessorCardName = styled.h2`
