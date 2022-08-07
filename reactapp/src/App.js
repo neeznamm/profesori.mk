@@ -1,25 +1,21 @@
-import { Outlet } from "react-router-dom";
-import { MainWrapper, MainTitle } from "./Components/Styled/Main.style";
-import Search from "./Components/Search.js";
+import Professor from "./Pages/Professor";
+import SearchResults from "./Pages/SearchResults";
+import Login from "./Pages/Login";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./Pages/Home";
 
 export default function App() {
-  //document.body.style = "background: red;";
   return (
-    <MainWrapper>
-      <style>
-        @import
-        url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
-      </style>
-      <style>
-        {
-          "body { background-color: papayawhip;} * {margin: 0; padding: 0; box-sizing: border-box;}"
-        }
-      </style>
-      <a href="/">
-        <MainTitle>profesori.mk</MainTitle>
-      </a>{" "}
-      <Search />
-      <Outlet />
-    </MainWrapper>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route path="login" element={<Login />}></Route>
+          <Route path="professor">
+            <Route path=":professorId" element={<Professor />} />
+          </Route>
+          <Route path="search" element={<SearchResults />}></Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
