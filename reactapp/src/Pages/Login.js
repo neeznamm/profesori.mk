@@ -1,23 +1,22 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
+import { Navigate } from "react-router-dom";
+import AuthApi from "../api/AuthApi";
 import axios from "../api/axios";
+import Cookies from "js-cookie";
 const LOGIN_URL = "/login";
 
 const Login = () => {
+  const { auth, setAuth } = useContext(AuthApi);
   const userRef = useRef();
   const errRef = useRef();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
   }, []);
-
-  useEffect(() => {
-    setErrMsg("");
-  }, [username, password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,19 +31,36 @@ const Login = () => {
         },
       }
     );
+    if (!response.request.responseURL.includes("error")) {
+      // ako NE redirektira na /login?error
+      Cookies.set("JSESSIONID", response.data.sessionId);
+      setAuth(true);
+      setErrMsg("");
+    } else {
+      setErrMsg("Погрешно корисиничко име и/или лозинка");
+    }
+
     setUsername("");
     setPassword("");
-    setSuccess(true);
   };
 
-  return success ? (
+  const handleLogout = () => {
+    setAuth(false);
+    Cookies.remove("JSESSIONID");
+  };
+
+  return auth ? (
+    /*
     <div style={{ marginTop: "140px" }}>
       <h1>Успешна најава!</h1>
       <br />
       <p>
-        <a href="/">Оди на почетната страница</a>
+        <a href="/user">Оди на protected</a>
       </p>
+      <button onClick={handleLogout}>Одјави се</button>
     </div>
+    */
+    <Navigate to="/user" />
   ) : (
     <div style={{ marginTop: "140px" }}>
       <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"}>

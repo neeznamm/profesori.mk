@@ -19,6 +19,7 @@ function Home() {
         <MainTitle>profesori.mk</MainTitle>
       </a>{" "}
       <Search />
+      <div style={{ marginTop: "140px" }}></div>
       <Outlet />
     </MainWrapper>
   );

@@ -52,7 +52,7 @@ public class CustomUserDetails implements UserDetails {
     @OneToMany(mappedBy = "customUserDetails", cascade = CascadeType.ALL)
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Post> authoredPosts = new ArrayList<>();
+    private Set<Post> authoredPosts = new HashSet<>();
 
     public CustomUserDetails(String fullName, String username, String email, String password, UserRole userRole) {
         this.fullName = fullName;
@@ -98,7 +98,7 @@ public class CustomUserDetails implements UserDetails {
         return enabled;
     }
 
-    List<Post> getAuthoredPosts() {
+    public Set<Post> getAuthoredPosts() {
         return this.authoredPosts;
     }
 

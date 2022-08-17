@@ -17,7 +17,7 @@ function Professor(props) {
   let [loaded, setLoaded] = useState(null);
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
+    const url = `http://192.168.0.18:8080/public/professor/${params.professorId}`;
 
     const fetchData = async () => {
       try {

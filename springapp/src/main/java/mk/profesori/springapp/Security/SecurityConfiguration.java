@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -35,9 +36,15 @@ public class SecurityConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://192.168.0.17:3000", "http://192.168.0.24:3000");
+                registry.addMapping("/**").allowedOrigins("http://192.168.0.18:3000", "http://192.168.0.24:3000")
+                        .allowCredentials(true);
             }
         };
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
     }
 
     @Bean
@@ -53,7 +60,7 @@ public class SecurityConfiguration {
                 .antMatchers("/public/**").permitAll()
                 .antMatchers("/registration/**").permitAll()
                 .and()
-                .formLogin();
+                .formLogin().successHandler(customAuthenticationSuccessHandler());
 
         return http.build();
     }
