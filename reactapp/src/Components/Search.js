@@ -14,7 +14,7 @@ function Search() {
   const [professors, setProfessors] = useState([]);
 
   useEffect(() => {
-    const url = `http://192.168.0.18:8080/public/professors/nameContains/${transliterate(
+    const url = `http://192.168.0.17:8080/public/professors/nameContains/${transliterate(
       query
     )}`;
 
@@ -22,12 +22,11 @@ function Search() {
       try {
         const response = await fetch(url);
         var cyclicGraph = await response.json();
-        var jsogStructure = JSOG.encode(cyclicGraph); // has { '@ref': 'ID' } links instead of cycles
+        var jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
         setProfessors(cyclicGraph);
-        //setLoaded(true);
       } catch (error) {
-        console.log("Fetching error occured", error);
+        console.log("Fetching error", error);
       }
     };
 

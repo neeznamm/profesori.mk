@@ -53,6 +53,7 @@ public class CustomUserDetails implements UserDetails {
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Post> authoredPosts = new HashSet<>();
+    private Integer karma;
 
     public CustomUserDetails(String fullName, String username, String email, String password, UserRole userRole) {
         this.fullName = fullName;
@@ -100,6 +101,14 @@ public class CustomUserDetails implements UserDetails {
 
     public Set<Post> getAuthoredPosts() {
         return this.authoredPosts;
+    }
+
+    public Integer getKarma() {
+        Integer karma = 0;
+        for (Post post : this.authoredPosts) {
+            karma += post.getUpvoteCount() - post.getDownvoteCount();
+        }
+        return karma;
     }
 
 }

@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { MainWrapper, MainTitle } from "../Components/Styled/Main.style";
 import { Outlet } from "react-router-dom";
 import Search from "../Components/Search";
+import UserHeader from "../Components/UserHeader";
+import AuthApi from "../api/AuthApi";
 
 function Home() {
+  const { auth, setAuth } = useContext(AuthApi);
+
   return (
     <MainWrapper>
       <style>
@@ -19,6 +23,7 @@ function Home() {
         <MainTitle>profesori.mk</MainTitle>
       </a>{" "}
       <Search />
+      {auth && <UserHeader />}
       <div style={{ marginTop: "140px" }}></div>
       <Outlet />
     </MainWrapper>

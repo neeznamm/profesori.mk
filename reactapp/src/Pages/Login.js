@@ -44,23 +44,8 @@ const Login = () => {
     setPassword("");
   };
 
-  const handleLogout = () => {
-    setAuth(false);
-    Cookies.remove("JSESSIONID");
-  };
-
   return auth ? (
-    /*
-    <div style={{ marginTop: "140px" }}>
-      <h1>Успешна најава!</h1>
-      <br />
-      <p>
-        <a href="/user">Оди на protected</a>
-      </p>
-      <button onClick={handleLogout}>Одјави се</button>
-    </div>
-    */
-    <Navigate to="/user" />
+    <Navigate to="/user_dashboard" />
   ) : (
     <div style={{ marginTop: "140px" }}>
       <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"}>

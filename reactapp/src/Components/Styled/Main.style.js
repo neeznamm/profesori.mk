@@ -5,6 +5,7 @@ export const MainWrapper = styled.div`
   background-color: ivory;
   margin: auto;
   margin-top: 20px;
+  margin-bottom: 20px;
   padding-left: 50px;
   padding-right: 50px;
   padding-top: 30px;

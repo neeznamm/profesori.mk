@@ -24,7 +24,7 @@ import mk.profesori.springapp.Service.MainService;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.0.18:3000", "http://192.168.0.24:3000" })
+@CrossOrigin(origins = { "http://192.168.0.17:3000", "http://192.168.0.24:3000" })
 public class SecureController {
 
     @Autowired
@@ -59,7 +59,7 @@ public class SecureController {
         }
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    @RequestMapping(value = "/currentUser", method = RequestMethod.GET)
     public UserDetails getUserDetails(@CurrentSecurityContext SecurityContext context) {
 
         Authentication authentication = context.getAuthentication();

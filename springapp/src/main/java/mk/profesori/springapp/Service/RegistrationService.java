@@ -44,7 +44,7 @@ public class RegistrationService {
             if (!userRepository.findByEmail(request.getEmail()).get().isEnabled()) {
                 String tokenToResend = customUserDetailsService
                         .createToken(userRepository.findByEmail(request.getEmail()).get());
-                String link = "http://192.168.0.18:8080/registration/confirm?token=" + tokenToResend;
+                String link = "http://192.168.0.17:8080/registration/confirm?token=" + tokenToResend;
                 emailSender.send(request.getEmail(), emailSender.buildEmail(request.getUsername(), link));
                 return tokenToResend;
             } else {
@@ -65,7 +65,7 @@ public class RegistrationService {
                         request.getPassword(),
                         UserRole.REGULAR));
 
-        String link = "http://192.168.0.18:8080/registration/confirm?token=" + token;
+        String link = "http://192.168.0.17:8080/registration/confirm?token=" + token;
 
         emailSender.send(request.getEmail(), emailSender.buildEmail(request.getUsername(), link));
 

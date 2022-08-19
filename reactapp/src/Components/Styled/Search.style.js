@@ -29,8 +29,8 @@ export const SearchDropdown = styled.div`
 export const SearchResult = styled.div`
   &:hover {
     background-color: papayawhip;
-    border: 1px solid blue;
-    text-decoration: underline 1px blue;
+    border: 1px solid #0066cc;
+    text-decoration: underline 1px #0066cc;
   }
   padding: 10px;
   border: 1px solid transparent;
