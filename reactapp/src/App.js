@@ -7,16 +7,37 @@ import UserDashboard from "./Pages/UserDashboard";
 import { useEffect, useState, useMemo } from "react";
 import AuthApi from "./api/AuthApi";
 import Cookies from "js-cookie";
+import axios from "./api/axios";
+import JSOG from "jsog";
 
 export default function App() {
   const [auth, setAuth] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userLoaded, setUserLoaded] = useState(false);
   const variableAuth = useMemo(() => ({ auth, setAuth }), [auth]);
   const [authLoaded, setAuthLoaded] = useState(false);
+
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.0.19:8080/secure/currentUser",
+        { withCredentials: true }
+      );
+      var cyclicGraph = await response.data;
+      var jsogStructure = JSOG.encode(cyclicGraph);
+      cyclicGraph = JSOG.decode(jsogStructure);
+      setUser(cyclicGraph);
+      setUserLoaded(true);
+    } catch (error) {
+      console.log("Fetching error", error);
+    }
+  };
 
   const readCookie = async () => {
     const session = Cookies.get("JSESSIONID");
     if (session) {
       setAuth(true); // go stava true ako postoi takvo cookie (zasto auth=false na sekoe renderiranje)
+      fetchUser();
     } else {
       setAuth(false);
     }
@@ -42,17 +63,23 @@ export default function App() {
     <AuthApi.Provider value={variableAuth}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
+          <Route
+            path="/"
+            element={<Home user={user} userLoaded={userLoaded} />}
+          >
             <Route path="login" element={<Login />}></Route>
             <Route path="professor">
-              <Route path=":professorId" element={<Professor />} />
+              <Route
+                path=":professorId"
+                element={<Professor user={user} userLoaded={userLoaded} />}
+              />
             </Route>
             <Route path="search" element={<SearchResults />}></Route>
             <Route
               path="user_dashboard"
               element={
                 <ProtectedRoute auth={auth}>
-                  <UserDashboard />
+                  {<UserDashboard user={user} userLoaded={userLoaded} />}
                 </ProtectedRoute>
               }
             ></Route>

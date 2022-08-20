@@ -60,5 +60,6 @@ export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   transition: 0.5s;
   &:hover {
     color: ${(props) => props.color};
+    cursor: pointer;
   }
 `;

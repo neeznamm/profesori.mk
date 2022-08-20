@@ -26,7 +26,7 @@ export const Modal = styled.div`
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
   overflow: auto;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
@@ -46,7 +46,7 @@ const animatetop = keyframes`
 export const ModalContent = styled.div`
   background-color: #fefefe;
   margin: 15% auto;
-  padding: 0;
+  padding: 20px;
   border: 1px solid #888;
   width: 80%;
   animation: ${animatetop} 0.4s;
@@ -71,21 +71,26 @@ export const ModalHeader = styled.div`
   background-color: rgba(0, 102, 204, 0.6);
   color: white;
   height: 40px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 `;
 
-export const ModalFooter = styled.div`
+export const ModalFooter = styled.button`
   padding: 2px 16px;
   background-color: rgba(0, 102, 204, 1);
   opacity: 0.6;
   color: white;
   height: 40px;
-  margin-top: 10px;
+  margin-top: 30px;
   transition: 0.4s;
   &:hover {
     opacity: 1;
     cursor: pointer;
   }
+  font-family: "Roboto Mono", monospace;
+  width: 100%;
+  border: 0;
+  font-size: 18px;
+  font-weight: bold;
 `;
 
 export const ModalBody = styled.div`
@@ -108,4 +113,5 @@ export const ModalTextarea = styled.textarea`
   display: block;
   padding: 12px 16px;
   border: 1px solid #ccc;
+  resize: none;
 `;

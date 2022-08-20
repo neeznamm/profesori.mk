@@ -21,20 +21,21 @@ import {
 } from "../Components/Styled/ProfessorCard.style";
 import AuthApi from "../api/AuthApi";
 import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 
-function Professor() {
+function Professor(user, userLoaded) {
   let params = useParams();
 
   let [professor, setProfessor] = useState(null);
   let [loaded, setLoaded] = useState(null);
-  let [modalDisplay, setModalDisplay] = useState("none");
+  let [postModalDisplay, setPostModalDisplay] = useState("none");
   let navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthApi);
-  const [addPostTitle, setAddPostTitle] = useState("");
-  const [addPostContent, setAddPostContent] = useState("");
+  const [postTitle, setPostTitle] = useState("");
+  const [postContent, setPostContent] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
+    const url = `http://192.168.0.19:8080/public/professor/${params.professorId}`;
 
     const fetchData = async () => {
       try {
@@ -54,25 +55,40 @@ function Professor() {
 
   const handleAddOpinionButtonClick = () => {
     if (auth) {
-      setModalDisplay("block");
+      setPostModalDisplay("block");
     } else {
       navigate("/login");
     }
   };
 
   const handleModalCloseClick = () => {
-    setModalDisplay("none");
-    console.log("here");
+    setPostModalDisplay("none");
   };
 
-  const handlePostSubmit = () => {};
+  const handlePostSubmit = async (e) => {
+    e.preventDefault();
+
+    const response = await axios(
+      `http://192.168.0.19:8080/secure/professor/${professor.professorId}/addOpinion`,
+      {
+        method: "post",
+        data: {
+          title: postTitle,
+          content: postContent,
+        },
+        withCredentials: true,
+      }
+    );
+
+    window.location.reload(false);
+  };
 
   const handleTitleChange = (e) => {
-    setAddPostTitle(e.target.value);
+    setPostTitle(e.target.value);
   };
 
   const handleContentChange = (e) => {
-    setAddPostContent(e.target.value);
+    setPostContent(e.target.value);
   };
 
   if (loaded) {
@@ -99,12 +115,14 @@ function Professor() {
             {professor.relatedOpinions.length}{" "}
             {professor.relatedOpinions.length !== 1 ? "мислења" : "мислење"}
           </h3>
-          <AddOpinionButton onClick={handleAddOpinionButtonClick}>
-            Објави мислење
-          </AddOpinionButton>
+          {auth && (
+            <AddOpinionButton onClick={handleAddOpinionButtonClick}>
+              Објави мислење
+            </AddOpinionButton>
+          )}
         </div>
 
-        <Modal display={modalDisplay}>
+        <Modal display={postModalDisplay}>
           <ModalContent>
             <ModalHeader>
               <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
@@ -112,37 +130,39 @@ function Professor() {
                 Мислење за {professor.professorName}
               </h3>
             </ModalHeader>
-            <ModalBody>
-              <form onSubmit={handlePostSubmit}>
-                <label for="title">
+            <form onSubmit={handlePostSubmit}>
+              <ModalBody>
+                <label htmlFor="title">
                   <b>Наслов</b>:
                   <ModalInput
                     id="title"
                     type="text"
-                    value={addPostTitle}
+                    value={postTitle}
                     onChange={handleTitleChange}
                   />
                 </label>
-                <label for="content">
+                <label htmlFor="content">
                   <b>Содржина</b>:
                   <ModalTextarea
                     id="content"
                     rows="8"
                     cols="100"
-                    value={addPostContent}
+                    value={postContent}
                     onChange={handleContentChange}
                   />
                 </label>
-              </form>
-            </ModalBody>
-            <ModalFooter>
-              <h2 style={{ textAlign: "center" }}>ОБЈАВИ</h2>
-            </ModalFooter>
+              </ModalBody>
+              <ModalFooter type="submit">ОБЈАВИ</ModalFooter>
+            </form>
           </ModalContent>
         </Modal>
 
         <div className="opinionTree">
-          <OpinionTree professor={professor} />
+          <OpinionTree
+            professor={professor}
+            user={user}
+            userLoaded={userLoaded}
+          />
         </div>
         <Outlet />
       </div>

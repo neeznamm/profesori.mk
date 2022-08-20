@@ -5,7 +5,7 @@ import Search from "../Components/Search";
 import UserHeader from "../Components/UserHeader";
 import AuthApi from "../api/AuthApi";
 
-function Home() {
+function Home({ user, userLoaded }) {
   const { auth, setAuth } = useContext(AuthApi);
 
   return (
@@ -23,7 +23,7 @@ function Home() {
         <MainTitle>profesori.mk</MainTitle>
       </a>{" "}
       <Search />
-      {auth && <UserHeader />}
+      {auth && <UserHeader user={user} userLoaded={userLoaded} />}
       <div style={{ marginTop: "140px" }}></div>
       <Outlet />
     </MainWrapper>

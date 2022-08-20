@@ -24,7 +24,7 @@ import mk.profesori.springapp.Service.MainService;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.0.17:3000", "http://192.168.0.24:3000" })
+@CrossOrigin(origins = { "http://192.168.0.19:3000", "http://192.168.0.24:3000" })
 public class SecureController {
 
     @Autowired

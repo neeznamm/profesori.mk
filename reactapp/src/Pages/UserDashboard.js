@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import JSOG from "jsog";
-import axios from "../api/axios";
+import React, { useEffect } from "react";
 import {
   OpinionCard,
   OpinionCardContent,
@@ -13,31 +11,15 @@ import {
 } from "../Components/Styled/UserDetails.style";
 import { dateConverter } from "../Util/dateConverter";
 
-function UserDashboard() {
-  const [user, setUser] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-
+function UserDashboard({ user, userLoaded }) {
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://192.168.0.17:8080/secure/currentUser",
-          { withCredentials: true }
-        );
-        var cyclicGraph = await response.data;
-        var jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setUser(cyclicGraph);
-        setLoaded(true);
-      } catch (error) {
-        console.log("Fetching error", error);
-      }
-    };
-
-    fetchData();
+    const timer = setTimeout(() => {
+      if (user === null) window.location.reload(false);
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
-  return loaded ? (
+  return userLoaded ? (
     <>
       <h3>Кориснички податоци:</h3>
       <UserDetailsCard>
