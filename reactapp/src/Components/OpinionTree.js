@@ -34,6 +34,8 @@ function OpinionTree({ professor, user, userLoaded }) {
   let [replyModalDisplay, setReplyModalDisplay] = useState("none");
   const [replyContent, setReplyContent] = useState("");
 
+  const [postForModal, setPostForModal] = useState(null);
+
   const handleLike = () => {
     if (auth) {
       return;
@@ -50,9 +52,10 @@ function OpinionTree({ professor, user, userLoaded }) {
     }
   };
 
-  const handleReply = () => {
+  const handleReply = (opinion) => {
     if (auth) {
       setReplyModalDisplay("block");
+      setPostForModal(opinion);
     } else {
       navigate("/login");
     }
@@ -119,7 +122,7 @@ function OpinionTree({ professor, user, userLoaded }) {
                   icon={solid("reply")}
                   right={90 + "px"}
                   color="black"
-                  onClick={handleReply} //todo
+                  onClick={() => handleReply(child)}
                 />
               </>
             )}
@@ -143,33 +146,6 @@ function OpinionTree({ professor, user, userLoaded }) {
           postCount = renderedOpinionIds.push(opinion.postId);
           return (
             <div key={opinion.postId}>
-              <Modal display={replyModalDisplay}>
-                <ModalContent>
-                  <ModalHeader>
-                    <ModalClose onClick={handleModalCloseClick}>
-                      &times;
-                    </ModalClose>
-                    <h3 style={{ marginTop: "5px" }}>
-                      Реплика на {opinion.author.username}
-                    </h3>
-                  </ModalHeader>
-                  <form onSubmit={(e) => handleReplySubmit(e, opinion.postId)}>
-                    <ModalBody>
-                      <label htmlFor="content">
-                        <b>Содржина</b>:
-                        <ModalTextarea
-                          id="content"
-                          rows="8"
-                          cols="100"
-                          value={replyContent}
-                          onChange={handleContentChange}
-                        />
-                      </label>
-                    </ModalBody>
-                    <ModalFooter type="submit">РЕПЛИЦИРАЈ</ModalFooter>
-                  </form>
-                </ModalContent>
-              </Modal>
               <OpinionCard>
                 <OpinionCardContent>
                   <p>
@@ -202,7 +178,7 @@ function OpinionTree({ professor, user, userLoaded }) {
                         icon={solid("reply")}
                         right={90 + "px"}
                         color="black"
-                        onClick={handleReply}
+                        onClick={() => handleReply(opinion)}
                       />
                     </>
                   )}
@@ -215,6 +191,33 @@ function OpinionTree({ professor, user, userLoaded }) {
           );
         }
       })}
+      {postForModal && (
+        <Modal display={replyModalDisplay}>
+          <ModalContent>
+            <ModalHeader>
+              <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
+              <h3 style={{ marginTop: "5px" }}>
+                Реплика на {postForModal.author.username}
+              </h3>
+            </ModalHeader>
+            <form onSubmit={(e) => handleReplySubmit(e, postForModal.postId)}>
+              <ModalBody>
+                <label htmlFor="content">
+                  <b>Содржина</b>:
+                  <ModalTextarea
+                    id="content"
+                    rows="8"
+                    cols="100"
+                    value={replyContent}
+                    onChange={handleContentChange}
+                  />
+                </label>
+              </ModalBody>
+              <ModalFooter type="submit">РЕПЛИЦИРАЈ</ModalFooter>
+            </form>
+          </ModalContent>
+        </Modal>
+      )}
     </div>
   );
 }
