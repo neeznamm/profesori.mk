@@ -35,7 +35,7 @@ function Professor(user, userLoaded) {
   const [postContent, setPostContent] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/public/professor/${params.professorId}`;
+    const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
 
     const fetchData = async () => {
       try {
@@ -69,7 +69,7 @@ function Professor(user, userLoaded) {
     e.preventDefault();
 
     const response = await axios(
-      `http://192.168.0.19:8080/secure/professor/${professor.professorId}/addOpinion`,
+      `http://192.168.0.17:8080/secure/professor/${professor.professorId}/addOpinion`,
       {
         method: "post",
         data: {

@@ -7,6 +7,7 @@ import {
   OpinionReplyCardContent,
   OpinionReplyCardContentTime,
   StyledFontAwesomeIcon,
+  VoteCount,
 } from "./Styled/OpinionCard.style";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { dateConverter } from "../Util/dateConverter";
@@ -36,19 +37,46 @@ function OpinionTree({ professor, user, userLoaded }) {
 
   const [postForModal, setPostForModal] = useState(null);
 
-  const handleLike = () => {
-    if (auth) {
-      return;
+  const handleLike = async (post) => {
+    if (
+      auth &&
+      userLoaded &&
+      !post.likes.some((e) => e.id === user.user.id) &&
+      !post.dislikes.some((e) => e.id === user.user.id)
+    ) {
+      const response = await axios(
+        `http://192.168.0.17:8080/secure/professor/${professor.professorId}/upvoteOpinion/${post.postId}`,
+        {
+          method: "get",
+          withCredentials: true,
+        }
+      );
+
+      window.location.reload(false);
     } else {
-      navigate("/login");
+      return;
     }
   };
 
-  const handleDislike = () => {
-    if (auth) {
-      return;
+  const handleDislike = async (post) => {
+    if (
+      auth &&
+      auth &&
+      userLoaded &&
+      !post.likes.some((e) => e.id === user.user.id) &&
+      !post.dislikes.some((e) => e.id === user.user.id)
+    ) {
+      const response = await axios(
+        `http://192.168.0.17:8080/secure/professor/${professor.professorId}/downvoteOpinion/${post.postId}`,
+        {
+          method: "get",
+          withCredentials: true,
+        }
+      );
+
+      window.location.reload(false);
     } else {
-      navigate("/login");
+      return;
     }
   };
 
@@ -73,7 +101,7 @@ function OpinionTree({ professor, user, userLoaded }) {
     e.preventDefault();
 
     const response = await axios(
-      `http://192.168.0.19:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
+      `http://192.168.0.17:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
       {
         method: "post",
         data: {
@@ -109,19 +137,29 @@ function OpinionTree({ professor, user, userLoaded }) {
                 <StyledFontAwesomeIcon
                   icon={solid("thumbs-up")}
                   right={50 + "px"}
-                  color="greenyellow"
-                  onClick={handleLike}
+                  color={
+                    child.likes.some((e) => e.id === user.user.id)
+                      ? "greenyellow"
+                      : "darkgrey"
+                  }
+                  onClick={() => handleLike(child)}
                 />
+                <VoteCount right={50 + "px"}>{child.likes.length}</VoteCount>
                 <StyledFontAwesomeIcon
                   icon={solid("thumbs-down")}
                   right={10 + "px"}
-                  color="indianred"
-                  onClick={handleDislike}
+                  color={
+                    child.dislikes.some((e) => e.id === user.user.id)
+                      ? "indianred"
+                      : "darkgrey"
+                  }
+                  onClick={() => handleDislike(child)}
                 />
+                <VoteCount right={10 + "px"}>{child.dislikes.length}</VoteCount>
                 <StyledFontAwesomeIcon
                   icon={solid("reply")}
                   right={90 + "px"}
-                  color="black"
+                  color="darkgrey"
                   onClick={() => handleReply(child)}
                 />
               </>
@@ -165,19 +203,33 @@ function OpinionTree({ professor, user, userLoaded }) {
                       <StyledFontAwesomeIcon
                         icon={solid("thumbs-up")}
                         right={50 + "px"}
-                        color="greenyellow"
-                        onClick={handleLike}
+                        color={
+                          opinion.likes.some((e) => e.id === user.user.id)
+                            ? "greenyellow"
+                            : "darkgrey"
+                        }
+                        onClick={() => handleLike(opinion)}
                       />
+                      <VoteCount right={50 + "px"}>
+                        {opinion.likes.length}
+                      </VoteCount>
                       <StyledFontAwesomeIcon
                         icon={solid("thumbs-down")}
                         right={10 + "px"}
-                        color="indianred"
-                        onClick={handleDislike}
+                        color={
+                          opinion.dislikes.some((e) => e.id === user.user.id)
+                            ? "indianred"
+                            : "darkgrey"
+                        }
+                        onClick={() => handleDislike(opinion)}
                       />
+                      <VoteCount right={10 + "px"}>
+                        {opinion.dislikes.length}
+                      </VoteCount>
                       <StyledFontAwesomeIcon
                         icon={solid("reply")}
                         right={90 + "px"}
-                        color="black"
+                        color="darkgrey"
                         onClick={() => handleReply(opinion)}
                       />
                     </>

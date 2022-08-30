@@ -51,7 +51,7 @@ export const OpinionReplyCardContentTime = styled.p`
 `;
 
 export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
-  color: darkgrey;
+  color: ${(props) => props.color};
   display: block;
   position: absolute;
   top: 50%;
@@ -62,4 +62,14 @@ export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
     color: ${(props) => props.color};
     cursor: pointer;
   }
+`;
+
+export const VoteCount = styled.p`
+  color: darkgrey;
+  display: block;
+  position: absolute;
+  top: 80%;
+  transform: translateY(-50%);
+  right: ${(props) => props.right};
+  transition: 0.5s;
 `;

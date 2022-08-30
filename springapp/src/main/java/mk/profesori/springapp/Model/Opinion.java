@@ -22,16 +22,16 @@ public class Opinion extends Post {
     // konstruktor so parent (koga e reply)
     public Opinion(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
-            Integer upvoteCount, Integer downvoteCount, Post parent, List<Post> children, Professor targetProfessor) {
-        super(title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, parent, children);
+            Post parent, List<Post> children, Professor targetProfessor) {
+        super(title, content, author, timePosted, timeLastEdited, parent, children);
         this.targetProfessor = targetProfessor;
     }
 
     // konstruktor bez parent (koga NE e reply)
     public Opinion(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
-            Integer upvoteCount, Integer downvoteCount, List<Post> children, Professor targetProfessor) {
-        super(title, content, author, timePosted, timeLastEdited, upvoteCount, downvoteCount, children);
+            List<Post> children, Professor targetProfessor) {
+        super(title, content, author, timePosted, timeLastEdited, children);
         this.targetProfessor = targetProfessor;
     }
 

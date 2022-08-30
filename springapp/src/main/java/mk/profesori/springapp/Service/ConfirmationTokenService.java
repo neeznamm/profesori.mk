@@ -12,7 +12,7 @@ import mk.profesori.springapp.Repository.ConfirmationTokenRepository;
 @Service
 @AllArgsConstructor
 public class ConfirmationTokenService {
-    
+
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
     public void saveConfirmationToken(ConfirmationToken token) {

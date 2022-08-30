@@ -21,19 +21,19 @@ import mk.profesori.springapp.Repository.UserRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
     @Autowired
-    public PasswordEncoder passwordEncoder()
-    {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     private final static String USER_NOT_FOUND_MSG = "User with email %s not found";
     private final ConfirmationTokenService confirmationTokenService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG,email))
-            );
+                () -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email)));
     }
 
     public String signUp(CustomUserDetails customUserDetails) {
@@ -50,12 +50,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     public String createToken(CustomUserDetails customUserDetails) {
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = new ConfirmationToken(
-            token,
-            LocalDateTime.now(),
-            LocalDateTime.now().plusMinutes(10),
-            customUserDetails
-        );
-        
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(10),
+                customUserDetails);
+
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
     }

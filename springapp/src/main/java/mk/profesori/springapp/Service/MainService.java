@@ -12,6 +12,7 @@ import mk.profesori.springapp.Repository.OpinionRepository;
 import mk.profesori.springapp.Repository.ProfessorRepository;
 import mk.profesori.springapp.Repository.StudyProgrammeRepository;
 import mk.profesori.springapp.Repository.UniversityRepository;
+import mk.profesori.springapp.Repository.UserRepository;
 import mk.profesori.springapp.Model.City;
 import mk.profesori.springapp.Model.CustomUserDetails;
 import mk.profesori.springapp.Model.Faculty;
@@ -35,6 +36,8 @@ public class MainService {
     private CityRepository cityRepository;
     @Autowired
     private OpinionRepository opinionRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Professor> getAllProfessors() {
 
@@ -137,7 +140,7 @@ public class MainService {
         Professor targetProfessor = professorRepository.findByProfessorId(professorId);
 
         Opinion opinionToAdd = new Opinion(title, content, currentUser, null, null,
-                null, null, null, targetProfessor);
+                null, targetProfessor);
 
         opinionRepository.save(opinionToAdd);
     }
@@ -148,10 +151,42 @@ public class MainService {
         Opinion targetOpinion = opinionRepository.findByPostId(postId);
 
         Opinion opinionToAdd = new Opinion(null, content, currentUser, null, null,
-                null, null, targetOpinion, null, targetProfessor);
+                targetOpinion, null, targetProfessor);
         opinionRepository.save(opinionToAdd);
 
         targetOpinion.getChildren().add(opinionToAdd);
         opinionRepository.save(targetOpinion);
+    }
+
+    public void upvoteOpinion(Long postId, CustomUserDetails currentUser) {
+        Opinion targetOpinion = opinionRepository.findByPostId(postId);
+
+        if (!targetOpinion.getLikes().contains(currentUser)) {
+
+            targetOpinion.getLikes().add(currentUser);
+            // opinionRepository.save(targetOpinion);
+
+            targetOpinion.getAuthor().setKarma(targetOpinion.getAuthor().getKarma() + 1);
+            userRepository.save(targetOpinion.getAuthor());
+
+            currentUser.getLikedPosts().add(targetOpinion);
+            userRepository.save(currentUser);
+        }
+    }
+
+    public void downvoteOpinion(Long postId, CustomUserDetails currentUser) {
+        Opinion targetOpinion = opinionRepository.findByPostId(postId);
+
+        if (!targetOpinion.getDislikes().contains(currentUser)) {
+
+            targetOpinion.getDislikes().add(currentUser);
+            // opinionRepository.save(targetOpinion);
+
+            targetOpinion.getAuthor().setKarma(targetOpinion.getAuthor().getKarma() - 1);
+            userRepository.save(targetOpinion.getAuthor());
+
+            currentUser.getDislikedPosts().add(targetOpinion);
+            userRepository.save(currentUser);
+        }
     }
 }

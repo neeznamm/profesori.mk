@@ -11,9 +11,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
@@ -49,11 +53,17 @@ public class CustomUserDetails implements UserDetails {
     private UserRole userRole;
     private Boolean locked = false;
     private Boolean enabled = false;
-    @OneToMany(mappedBy = "customUserDetails", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customUserDetails", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Post> authoredPosts = new HashSet<>();
-    private Integer karma;
+    private Integer karma = 0;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "post_like", joinColumns = @JoinColumn(name = "custom_user_details_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+    Set<Post> likedPosts;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "post_dislike", joinColumns = @JoinColumn(name = "custom_user_details_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+    Set<Post> dislikedPosts;
 
     public CustomUserDetails(String fullName, String username, String email, String password, UserRole userRole) {
         this.fullName = fullName;
@@ -104,11 +114,26 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Integer getKarma() {
-        Integer karma = 0;
-        for (Post post : this.authoredPosts) {
-            karma += post.getUpvoteCount() - post.getDownvoteCount();
-        }
-        return karma;
+        return this.karma;
     }
 
+    public void setKarma(Integer karma) {
+        this.karma = karma;
+    }
+
+    public Set<Post> getLikedPosts() {
+        return this.likedPosts;
+    }
+
+    public void setLikedPosts(Set<Post> likedPosts) {
+        this.likedPosts = likedPosts;
+    }
+
+    public Set<Post> getDislikedPosts() {
+        return this.dislikedPosts;
+    }
+
+    public void setDislikedPosts(Set<Post> dislikedPosts) {
+        this.likedPosts = dislikedPosts;
+    }
 }

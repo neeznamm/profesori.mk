@@ -20,7 +20,7 @@ export default function App() {
   const fetchUser = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.0.19:8080/secure/currentUser",
+        "http://192.168.0.17:8080/secure/currentUser",
         { withCredentials: true }
       );
       var cyclicGraph = await response.data;

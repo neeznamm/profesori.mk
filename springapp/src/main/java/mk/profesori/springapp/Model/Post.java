@@ -3,6 +3,7 @@ package mk.profesori.springapp.Model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,6 +16,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -51,18 +53,18 @@ public class Post {
     @Column(name = "time_last_edited")
     private LocalDateTime timeLastEdited;
 
-    @Column(name = "upvote_count")
-    private Integer upvoteCount;
-
-    @Column(name = "downvote_count")
-    private Integer downvoteCount;
-
     @ManyToOne
     @JoinColumn(name = "parent_post_id", nullable = true)
     private Post parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Post> children = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "likedPosts")
+    Set<CustomUserDetails> likes;
+
+    @ManyToMany(mappedBy = "dislikedPosts")
+    Set<CustomUserDetails> dislikes;
 
     // getters and setters
     public Long getPostId() {
@@ -113,22 +115,6 @@ public class Post {
         this.timeLastEdited = timeLastEdited;
     }
 
-    public Integer getUpvoteCount() {
-        return upvoteCount;
-    }
-
-    public void setUpvoteCount(Integer upvoteCount) {
-        this.upvoteCount = upvoteCount;
-    }
-
-    public Integer getDownvoteCount() {
-        return downvoteCount;
-    }
-
-    public void setDownvoteCount(Integer downvoteCount) {
-        this.downvoteCount = downvoteCount;
-    }
-
     public Post getParent() {
         return parent;
     }
@@ -145,17 +131,31 @@ public class Post {
         this.children = children;
     }
 
+    public Set<CustomUserDetails> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<CustomUserDetails> likes) {
+        this.likes = likes;
+    }
+
+    public Set<CustomUserDetails> getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(Set<CustomUserDetails> dislikes) {
+        this.dislikes = dislikes;
+    }
+
     // konstruktor so parent (koga e reply)
     public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
-            Integer upvoteCount, Integer downvoteCount, Post parent, List<Post> children) {
+            Post parent, List<Post> children) {
         this.title = title;
         this.content = content;
         this.author = author;
         this.timePosted = LocalDateTime.now();
         this.timeLastEdited = LocalDateTime.now();
-        this.upvoteCount = 0;
-        this.downvoteCount = 0;
         this.parent = parent;
         this.children = new ArrayList<>();
     }
@@ -163,14 +163,12 @@ public class Post {
     // konstruktor bez parent (koga NE e reply)
     public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
-            Integer upvoteCount, Integer downvoteCount, List<Post> children) {
+            List<Post> children) {
         this.title = title;
         this.content = content;
         this.author = author;
         this.timePosted = LocalDateTime.now();
         this.timeLastEdited = LocalDateTime.now();
-        this.upvoteCount = 0;
-        this.downvoteCount = 0;
         this.parent = null;
         this.children = new ArrayList<>();
     }

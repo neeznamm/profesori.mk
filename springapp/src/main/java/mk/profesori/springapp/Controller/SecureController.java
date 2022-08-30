@@ -24,7 +24,7 @@ import mk.profesori.springapp.Service.MainService;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.0.19:3000", "http://192.168.0.24:3000" })
+@CrossOrigin(origins = { "http://192.168.0.17:3000", "http://192.168.0.24:3000" })
 public class SecureController {
 
     @Autowired
@@ -69,6 +69,30 @@ public class SecureController {
         }
 
         return null;
+    }
+
+    @RequestMapping(value = "/professor/{professorId}/upvoteOpinion/{postId}", method = RequestMethod.GET)
+    public void upvoteOpinion(@PathVariable Long professorId,
+            @PathVariable Long postId, @CurrentSecurityContext SecurityContext context) {
+
+        Authentication authentication = context.getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails currentUser = (CustomUserDetails) authentication.getPrincipal();
+            mainService.upvoteOpinion(postId, currentUser);
+        }
+    }
+
+    @RequestMapping(value = "/professor/{professorId}/downvoteOpinion/{postId}", method = RequestMethod.GET)
+    public void downvoteOpinion(@PathVariable Long professorId,
+            @PathVariable Long postId, @CurrentSecurityContext SecurityContext context) {
+
+        Authentication authentication = context.getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails currentUser = (CustomUserDetails) authentication.getPrincipal();
+            mainService.downvoteOpinion(postId, currentUser);
+        }
     }
 
 }

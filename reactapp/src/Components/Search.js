@@ -14,7 +14,7 @@ function Search() {
   const [professors, setProfessors] = useState([]);
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/public/professors/nameContains/${transliterate(
+    const url = `http://192.168.0.17:8080/public/professors/nameContains/${transliterate(
       query
     )}`;
 
