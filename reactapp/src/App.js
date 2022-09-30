@@ -1,6 +1,7 @@
 import Professor from "./Pages/Professor";
 import SearchResults from "./Pages/SearchResults";
 import Login from "./Pages/Login";
+import Registration from "./Pages/Registration";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Pages/Home";
 import UserDashboard from "./Pages/UserDashboard";
@@ -36,7 +37,7 @@ export default function App() {
   const readCookie = async () => {
     const session = Cookies.get("JSESSIONID");
     if (session) {
-      setAuth(true); // go stava true ako postoi takvo cookie (zasto auth=false na sekoe renderiranje)
+      setAuth(true);
       fetchUser();
     } else {
       setAuth(false);
@@ -68,6 +69,7 @@ export default function App() {
             element={<Home user={user} userLoaded={userLoaded} />}
           >
             <Route path="login" element={<Login />}></Route>
+            <Route path="registration" element={<Registration />}></Route>
             <Route path="professor">
               <Route
                 path=":professorId"

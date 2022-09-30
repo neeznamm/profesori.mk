@@ -104,7 +104,7 @@ function OpinionTree({ professor, user, userLoaded }) {
       `http://192.168.0.17:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
       {
         method: "post",
-        data: {
+        body: {
           content: replyContent,
         },
         withCredentials: true,

@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import AuthApi from "../api/AuthApi";
 import axios from "../api/axios";
 import Cookies from "js-cookie";
+import { LoginButton, LoginInput } from "../Components/Styled/Login.style";
 const LOGIN_URL = "/login";
 
 const Login = () => {
@@ -47,14 +48,31 @@ const Login = () => {
   return auth ? (
     <Navigate to="/user_dashboard" />
   ) : (
-    <div style={{ marginTop: "140px" }}>
-      <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"}>
-        {errMsg}
-      </p>
-      <h1>Најава</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">E-mail:</label>
-        <input
+    <div
+      style={{
+        marginTop: "140px",
+        display: "flex",
+        alignItems: "center",
+        flexFlow: "column",
+        width: "fit-content",
+        margin: "auto",
+        border: "2px solid lightgrey",
+        padding: "25px",
+        boxShadow: "2px 2px 6px #aaaaaa",
+        marginBottom: "80px",
+      }}
+    >
+      <h2>Најава</h2>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "400px",
+        }}
+      >
+        <LoginInput
           type="text"
           id="username"
           ref={userRef}
@@ -62,17 +80,28 @@ const Login = () => {
           onChange={(e) => setUsername(e.target.value)}
           value={username}
           required
+          placeholder="Email"
         />
-        <label htmlFor="password">Лозинка:</label>
-        <input
+        <LoginInput
           type="password"
           id="password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
+          placeholder="Лозинка"
           required
         />
-        <button>Најави се</button>
+        <LoginButton>Најави се</LoginButton>
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          style={{ color: "red", marginTop: "20px" }}
+        >
+          {errMsg}
+        </p>
       </form>
+      <p style={{ marginTop: "20px" }}>
+        Немаш сметка? <a href="/registration">Регистрирај се</a>{" "}
+      </p>
     </div>
   );
 };

@@ -11,6 +11,7 @@ export const MainWrapper = styled.div`
   padding-top: 30px;
   padding-bottom: 30px;
   width: 80%;
+  box-shadow: 2px 2px 10px #aaaaaa;
 `;
 
 export const MainTitle = styled.h1`

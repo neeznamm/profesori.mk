@@ -23,17 +23,13 @@ function UserDashboard({ user, userLoaded }) {
     <>
       <h3>Кориснички податоци:</h3>
       <UserDetailsCard>
-        <UserDetailsCardContent>
-          <b>Име:</b> {user.fullName}{" "}
-          <i style={{ fontSize: 14, color: "#0066cc" }}>
-            (<u>промени</u>)
-          </i>
-        </UserDetailsCardContent>
+        {user.fullName && (
+          <UserDetailsCardContent>
+            <b>Име:</b> {user.fullName}{" "}
+          </UserDetailsCardContent>
+        )}
         <UserDetailsCardContent>
           <b>Корисничко име:</b> {user.username}{" "}
-          <i style={{ fontSize: 14, color: "#0066cc" }}>
-            (<u>промени</u>)
-          </i>
         </UserDetailsCardContent>
         <UserDetailsCardContent>
           <b>E-mail:</b> {user.email}
