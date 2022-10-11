@@ -1,5 +1,6 @@
 package mk.profesori.springapp.Model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("thread")
 public class _Thread extends Post {
 
-    @Column(name = "tags")
+    @Column(name = "tags") // unused
     @ElementCollection
     private List<String> tags = new ArrayList<>();
 
@@ -26,16 +27,22 @@ public class _Thread extends Post {
     @JoinColumn(name = "subject_id")
     private Subject targetSubject;
 
-    // TODO threadovi
-    /*
-     * public _Thread(String title, String content, List<String> tags, Section
-     * parentSection, Subject targetSubject) {
-     * super(title, content);
-     * this.tags = tags;
-     * this.parentSection = parentSection;
-     * this.targetSubject = targetSubject;
-     * }
-     */
+    // konstruktor so parent (koga e reply)
+    public _Thread(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited,
+            Post parent, List<Post> children, Section parentSection, Subject targetSubject) {
+        super(title, content, author, timePosted, timeLastEdited, parent, children);
+        this.parentSection = parentSection;
+        this.targetSubject = targetSubject;
+    }
+
+    // konstruktor bez parent (koga NE e reply)
+    public _Thread(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
+            LocalDateTime timeLastEdited, List<Post> children, Section parentSection, Subject targetSubject) {
+        super(title, content, author, timePosted, timeLastEdited, children);
+        this.parentSection = parentSection;
+        this.targetSubject = targetSubject;
+    }
 
     // getters
     public List<String> getTags() {

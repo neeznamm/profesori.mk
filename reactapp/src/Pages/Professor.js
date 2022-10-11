@@ -22,6 +22,7 @@ import {
 import AuthApi from "../api/AuthApi";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
+import { CurrentPageNav } from "../Components/Styled/Main.style";
 
 function Professor(user, userLoaded) {
   let params = useParams();
@@ -33,6 +34,7 @@ function Professor(user, userLoaded) {
   const { auth, setAuth } = useContext(AuthApi);
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
@@ -46,7 +48,7 @@ function Professor(user, userLoaded) {
         setProfessor(cyclicGraph);
         setLoaded(true);
       } catch (error) {
-        console.log("Fetching error", error);
+        setFetchError(true);
       }
     };
 
@@ -94,6 +96,17 @@ function Professor(user, userLoaded) {
   if (loaded) {
     return (
       <div>
+        <CurrentPageNav>
+          &#187;{" "}
+          <a href={"/university/" + professor.faculty.university.universityId}>
+            {professor.faculty.university.universityName}
+          </a>{" "}
+          &#187;{" "}
+          <a href={"/faculty/" + professor.faculty.facultyId}>
+            {professor.faculty.facultyName}
+          </a>{" "}
+          &#187; <a href="#">{professor.professorName}</a>
+        </CurrentPageNav>
         <ProfessorCard>
           <ProfessorCardName>{professor.professorName}</ProfessorCardName>
           <ProfessorCardSeparator />
@@ -167,11 +180,17 @@ function Professor(user, userLoaded) {
         <Outlet />
       </div>
     );
-  } else {
+  } else if (!fetchError) {
     return (
       <div>
         <p style={{ marginTop: "140px" }}>се вчитува...</p>
         <Outlet />
+      </div>
+    );
+  } else {
+    return (
+      <div style={{ marginTop: "140px" }}>
+        <h1 style={{ textAlign: "center" }}>Страницата не е пронајдена.</h1>
       </div>
     );
   }

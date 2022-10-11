@@ -5,11 +5,15 @@ import Registration from "./Pages/Registration";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Pages/Home";
 import UserDashboard from "./Pages/UserDashboard";
+import Subject from "./Pages/Subject";
+import University from "./Pages/University";
+import Faculty from "./Pages/Faculty";
 import { useEffect, useState, useMemo } from "react";
 import AuthApi from "./api/AuthApi";
 import Cookies from "js-cookie";
 import axios from "./api/axios";
 import JSOG from "jsog";
+import NotFound from "./Pages/NotFound";
 
 export default function App() {
   const [auth, setAuth] = useState(false);
@@ -76,6 +80,9 @@ export default function App() {
                 element={<Professor user={user} userLoaded={userLoaded} />}
               />
             </Route>
+            <Route path="university/:universityId" element={<University />} />
+            <Route path="faculty/:facultyId" element={<Faculty />} />
+            <Route path="subject/:subjectId" element={<Subject />} />
             <Route path="search" element={<SearchResults />}></Route>
             <Route
               path="user_dashboard"
@@ -86,6 +93,7 @@ export default function App() {
               }
             ></Route>
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthApi.Provider>

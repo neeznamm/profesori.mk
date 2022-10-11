@@ -7,7 +7,7 @@ export const OpinionCard = styled.div`
   margin-top: 20px;
   margin-bottom: 20px;
   padding: 10px;
-  border: 1px solid black;
+  box-shadow: 2px 2px 10px #aaaaaa;
 `;
 
 export const OpinionCardContent = styled.div`

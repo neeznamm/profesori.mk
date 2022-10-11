@@ -1,11 +1,11 @@
 import styled from "styled-components";
 
 export const ProfessorCard = styled.div`
-  background-color: papayawhip;
+  background-color: cornsilk;
   width: auto;
   padding: 10px;
   margin-bottom: 30px;
-  margin-top: 140px;
+  margin-top: 40px;
 `;
 
 export const ProfessorCardName = styled.h2`

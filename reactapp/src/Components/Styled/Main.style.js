@@ -21,3 +21,8 @@ export const MainTitle = styled.h1`
   float: left;
   color: black;
 `;
+
+export const CurrentPageNav = styled.div`
+  font-style: italic;
+  font-size: 14px;
+`;
