@@ -1,49 +1,42 @@
 package mk.profesori.springapp.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import mk.profesori.springapp.Model.*;
+import mk.profesori.springapp.Repository.*;
 import org.springframework.stereotype.Service;
 
-import mk.profesori.springapp.Repository.CityRepository;
-import mk.profesori.springapp.Repository.FacultyRepository;
-import mk.profesori.springapp.Repository.OpinionRepository;
-import mk.profesori.springapp.Repository.ProfessorRepository;
-import mk.profesori.springapp.Repository.StudyProgrammeRepository;
-import mk.profesori.springapp.Repository.UniversityRepository;
-import mk.profesori.springapp.Repository.UserRepository;
-import mk.profesori.springapp.Model.City;
-import mk.profesori.springapp.Model.CustomUserDetails;
-import mk.profesori.springapp.Model.Faculty;
-import mk.profesori.springapp.Model.Opinion;
-import mk.profesori.springapp.Model.Professor;
-import mk.profesori.springapp.Model.StudyProgramme;
-import mk.profesori.springapp.Model.University;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MainService {
 
-    @Autowired
-    private ProfessorRepository professorRepository;
-    @Autowired
-    private StudyProgrammeRepository studyProgrammeRepository;
-    @Autowired
-    private FacultyRepository facultyRepository;
-    @Autowired
-    private UniversityRepository universityRepository;
-    @Autowired
-    private CityRepository cityRepository;
-    @Autowired
-    private OpinionRepository opinionRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final ProfessorRepository professorRepository;
+    private final StudyProgrammeRepository studyProgrammeRepository;
+    private final FacultyRepository facultyRepository;
+    private final UniversityRepository universityRepository;
+    private final CityRepository cityRepository;
+    private final OpinionRepository opinionRepository;
+    private final _ThreadRepository _threadRepository;
+    private final SubjectRepository subjectRepository;
+    private final PostVoteRepository postVoteRepository;
+    private final UserRepository userRepository;
+
+    public MainService(ProfessorRepository professorRepository, StudyProgrammeRepository studyProgrammeRepository, FacultyRepository facultyRepository, UniversityRepository universityRepository, CityRepository cityRepository, OpinionRepository opinionRepository, _ThreadRepository _threadRepository, SubjectRepository subjectRepository, PostVoteRepository postVoteRepository, UserRepository userRepository) {
+        this.professorRepository = professorRepository;
+        this.studyProgrammeRepository = studyProgrammeRepository;
+        this.facultyRepository = facultyRepository;
+        this.universityRepository = universityRepository;
+        this.cityRepository = cityRepository;
+        this.opinionRepository = opinionRepository;
+        this._threadRepository = _threadRepository;
+        this.subjectRepository = subjectRepository;
+        this.postVoteRepository = postVoteRepository;
+        this.userRepository = userRepository;
+    }
 
     public List<Professor> getAllProfessors() {
 
-        List<Professor> list = new ArrayList<>();
-        professorRepository.findAll().forEach(list::add);
-        return list;
+        return new ArrayList<>(professorRepository.findAll());
     }
 
     public Professor getProfessorById(Long id) {
@@ -55,22 +48,16 @@ public class MainService {
 
         Faculty faculty = facultyRepository.findByFacultyId(facultyId);
 
-        List<Professor> list = new ArrayList<>();
-        professorRepository.findByFaculty(faculty).forEach(list::add);
-        return list;
+        return new ArrayList<>(professorRepository.findByFaculty(faculty));
     }
 
     public List<Professor> getProfessorsByNameContains(String contained) {
-        List<Professor> list = new ArrayList<>();
-        professorRepository.findByProfessorNameContainingIgnoreCase(contained).forEach(list::add);
-        return list;
+        return new ArrayList<>(professorRepository.findByProfessorNameContainingIgnoreCase(contained));
     }
 
     public List<StudyProgramme> getAllStudyProgrammes() {
 
-        List<StudyProgramme> list = new ArrayList<>();
-        studyProgrammeRepository.findAll().forEach(list::add);
-        return list;
+        return new ArrayList<>(studyProgrammeRepository.findAll());
     }
 
     public StudyProgramme getStudyProgrammeById(Long id) {
@@ -82,15 +69,11 @@ public class MainService {
 
         Faculty faculty = facultyRepository.findByFacultyId(facultyId);
 
-        List<StudyProgramme> list = new ArrayList<>();
-        studyProgrammeRepository.findByFaculty(faculty).forEach(list::add);
-        return list;
+        return new ArrayList<>(studyProgrammeRepository.findByFaculty(faculty));
     }
 
     public List<Faculty> getAllFaculties() {
-        List<Faculty> list = new ArrayList<>();
-        facultyRepository.findAll().forEach(list::add);
-        return list;
+        return new ArrayList<>(facultyRepository.findAll());
     }
 
     public Faculty getFacultyById(Long id) {
@@ -101,15 +84,11 @@ public class MainService {
 
         University university = universityRepository.findByUniversityId(universityId);
 
-        List<Faculty> list = new ArrayList<>();
-        facultyRepository.findByUniversity(university).forEach(list::add);
-        return list;
+        return new ArrayList<>(facultyRepository.findByUniversity(university));
     }
 
     public List<University> getAllUniversities() {
-        List<University> list = new ArrayList<>();
-        universityRepository.findAll().forEach(list::add);
-        return list;
+        return new ArrayList<>(universityRepository.findAll());
     }
 
     public University getUniversityById(Long id) {
@@ -120,26 +99,22 @@ public class MainService {
 
         City city = cityRepository.findByCityId(cityId);
 
-        List<University> list = new ArrayList<>();
-        universityRepository.findByCity(city).forEach(list::add);
-        return list;
+        return new ArrayList<>(universityRepository.findByCity(city));
     }
 
     public List<City> getAllCities() {
-        List<City> list = new ArrayList<>();
-        cityRepository.findAll().forEach(list::add);
-        return list;
+        return new ArrayList<>(cityRepository.findAll());
     }
 
     public City getCityById(Long id) {
         return cityRepository.findByCityId(id);
     }
 
-    public void addOpinion(String title, String content, Long professorId, CustomUserDetails currentUser) {
+    public void addOpinion(String content, Long professorId, CustomUserDetails currentUser) {
 
         Professor targetProfessor = professorRepository.findByProfessorId(professorId);
 
-        Opinion opinionToAdd = new Opinion(title, content, currentUser, null, null,
+        Opinion opinionToAdd = new Opinion(null, content, currentUser, null, null,
                 null, targetProfessor);
 
         opinionRepository.save(opinionToAdd);
@@ -154,39 +129,66 @@ public class MainService {
                 targetOpinion, null, targetProfessor);
         opinionRepository.save(opinionToAdd);
 
+        //mozda ne treba
         targetOpinion.getChildren().add(opinionToAdd);
         opinionRepository.save(targetOpinion);
     }
 
-    public void upvoteOpinion(Long postId, CustomUserDetails currentUser) {
-        Opinion targetOpinion = opinionRepository.findByPostId(postId);
+    public void addThread(String title, String content, Long subjectId, CustomUserDetails currentUser) {
+        Subject targetSubject = subjectRepository.findBySubjectId(subjectId);
 
-        if (!targetOpinion.getLikes().contains(currentUser)) {
-
-            targetOpinion.getLikes().add(currentUser);
-            // opinionRepository.save(targetOpinion);
-
-            targetOpinion.getAuthor().setKarma(targetOpinion.getAuthor().getKarma() + 1);
-            userRepository.save(targetOpinion.getAuthor());
-
-            currentUser.getLikedPosts().add(targetOpinion);
-            userRepository.save(currentUser);
-        }
+        _Thread _threadToAdd = new _Thread(title, content, currentUser, null, null, null, targetSubject);
+        _threadRepository.save(_threadToAdd);
     }
 
+    public void replyToThread(String content, Long subjectId, Long postId, CustomUserDetails currentUser) {
+        Subject targetSubject = subjectRepository.findBySubjectId(subjectId);
+        _Thread target_Thread = _threadRepository.findByPostId(postId);
+
+        _Thread _threadToAdd = new _Thread(null, content, currentUser, null, null, target_Thread, null, targetSubject);
+        _threadRepository.save(_threadToAdd);
+
+        //mozda ne treba
+        target_Thread.getChildren().add(_threadToAdd);
+        _threadRepository.save(target_Thread);
+    }
+
+    public Subject getSubjectById(Long subjectId) {
+        return subjectRepository.findBySubjectId(subjectId);
+    }
+
+    public _Thread get_ThreadById(Long postId) {
+        return _threadRepository.findByPostId(postId);
+    }
+
+    public void upvoteOpinion(Long postId, CustomUserDetails currentUser) {
+        Post targetPost = opinionRepository.findByPostId(postId);
+        PostVote voteToAdd = new PostVote(currentUser, targetPost, VoteType.UPVOTE);
+        postVoteRepository.save(voteToAdd);
+        targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()+1);
+        userRepository.save(targetPost.getAuthor());
+    }
     public void downvoteOpinion(Long postId, CustomUserDetails currentUser) {
-        Opinion targetOpinion = opinionRepository.findByPostId(postId);
+        Post targetPost = opinionRepository.findByPostId(postId);
+        PostVote voteToAdd = new PostVote(currentUser, targetPost, VoteType.DOWNVOTE);
+        postVoteRepository.save(voteToAdd);
+        targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()-1);
+        userRepository.save(targetPost.getAuthor());
+    }
 
-        if (!targetOpinion.getDislikes().contains(currentUser)) {
+    public void upvote_Thread(Long postId, CustomUserDetails currentUser) {
+        Post targetPost = _threadRepository.findByPostId(postId);
+        PostVote voteToAdd = new PostVote(currentUser, targetPost, VoteType.UPVOTE);
+        postVoteRepository.save(voteToAdd);
+        targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()+1);
+        userRepository.save(targetPost.getAuthor());
 
-            targetOpinion.getDislikes().add(currentUser);
-            // opinionRepository.save(targetOpinion);
-
-            targetOpinion.getAuthor().setKarma(targetOpinion.getAuthor().getKarma() - 1);
-            userRepository.save(targetOpinion.getAuthor());
-
-            currentUser.getDislikedPosts().add(targetOpinion);
-            userRepository.save(currentUser);
-        }
+    }
+    public void downvote_Thread(Long postId, CustomUserDetails currentUser) {
+        Post targetPost = _threadRepository.findByPostId(postId);
+        PostVote voteToAdd = new PostVote(currentUser, targetPost, VoteType.DOWNVOTE);
+        postVoteRepository.save(voteToAdd);
+        targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()-1);
+        userRepository.save(targetPost.getAuthor());
     }
 }

@@ -17,7 +17,7 @@ export const EntityLi = styled.li`
 
 export const EntityParam = styled.p`
   position: absolute;
-  right: 30px;
+  right: ${(props) => props.right};
   top: 10px;
   font-style: italic;
   font-size: 16px;

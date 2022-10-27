@@ -1,27 +1,21 @@
 package mk.profesori.springapp.Model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
-import javax.persistence.ElementCollection;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import lombok.NoArgsConstructor;
+
 @Entity
 @DiscriminatorValue("thread")
+@NoArgsConstructor
 public class _Thread extends Post {
-
-    @Column(name = "tags") // unused
-    @ElementCollection
-    private List<String> tags = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "section_id")
-    private Section parentSection;
 
     @ManyToOne
     @JoinColumn(name = "subject_id")
@@ -30,27 +24,16 @@ public class _Thread extends Post {
     // konstruktor so parent (koga e reply)
     public _Thread(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
-            Post parent, List<Post> children, Section parentSection, Subject targetSubject) {
+            Post parent, List<Post> children, Subject targetSubject) {
         super(title, content, author, timePosted, timeLastEdited, parent, children);
-        this.parentSection = parentSection;
         this.targetSubject = targetSubject;
     }
 
     // konstruktor bez parent (koga NE e reply)
     public _Thread(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
-            LocalDateTime timeLastEdited, List<Post> children, Section parentSection, Subject targetSubject) {
+            LocalDateTime timeLastEdited, List<Post> children, Subject targetSubject) {
         super(title, content, author, timePosted, timeLastEdited, children);
-        this.parentSection = parentSection;
         this.targetSubject = targetSubject;
-    }
-
-    // getters
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public Section getParentSection() {
-        return parentSection;
     }
 
     public Subject getTargetSubject() {

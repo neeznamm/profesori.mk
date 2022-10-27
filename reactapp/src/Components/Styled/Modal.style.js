@@ -17,6 +17,7 @@ export const AddOpinionButton = styled.button`
   }
   float: right;
   font-weight: bold;
+  box-shadow: 2px 1px 10px #aaaaaa;
 `;
 
 export const Modal = styled.div`

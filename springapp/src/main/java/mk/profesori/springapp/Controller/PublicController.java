@@ -17,12 +17,14 @@ import mk.profesori.springapp.Model.City;
 import mk.profesori.springapp.Model.Faculty;
 import mk.profesori.springapp.Model.Professor;
 import mk.profesori.springapp.Model.StudyProgramme;
+import mk.profesori.springapp.Model.Subject;
 import mk.profesori.springapp.Model.University;
+import mk.profesori.springapp.Model._Thread;
 import mk.profesori.springapp.Service.MainService;
 
 @RestController
 @RequestMapping("/public")
-@CrossOrigin(origins = { "http://192.168.0.17:3000", "http://192.168.0.28:3000" })
+@CrossOrigin(origins = { "http://192.168.0.17:3000", "http://192.168.0.39:3000" })
 public class PublicController {
 
     @Autowired
@@ -95,6 +97,16 @@ public class PublicController {
     @RequestMapping(value = "/city/{cityId}", method = RequestMethod.GET)
     public City getCityById(@PathVariable Long cityId) {
         return mainService.getCityById(cityId); // vrakja grad spored id
+    }
+
+    @RequestMapping(value = "/subject/{subjectId}", method = RequestMethod.GET)
+    public Subject getSubjectById(@PathVariable Long subjectId) {
+        return mainService.getSubjectById(subjectId); // vrakja predmet spored id
+    }
+
+    @RequestMapping(value = "/thread/{postId}", method = RequestMethod.GET)
+    public _Thread getThreadById(@PathVariable Long postId) {
+        return mainService.get_ThreadById(postId); // vrakja thread (tema) spored id
     }
 
     @RequestMapping(value = "/loginSuccessRegular", method = RequestMethod.GET)

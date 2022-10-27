@@ -2,6 +2,7 @@ package mk.profesori.springapp.Model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,17 +55,22 @@ public class Post {
     private LocalDateTime timeLastEdited;
 
     @ManyToOne
-    @JoinColumn(name = "parent_post_id", nullable = true)
+    @JoinColumn(name = "parent_post_id")
     private Post parent;
+
+    @OneToMany(mappedBy = "post")
+    private Set<PostVote> votes = new HashSet<>();
+
+    public Set<PostVote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<PostVote> votes) {
+        this.votes = votes;
+    }
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Post> children = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "likedPosts")
-    Set<CustomUserDetails> likes;
-
-    @ManyToMany(mappedBy = "dislikedPosts")
-    Set<CustomUserDetails> dislikes;
 
     // getters and setters
     public Long getPostId() {
@@ -131,22 +137,6 @@ public class Post {
         this.children = children;
     }
 
-    public Set<CustomUserDetails> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Set<CustomUserDetails> likes) {
-        this.likes = likes;
-    }
-
-    public Set<CustomUserDetails> getDislikes() {
-        return dislikes;
-    }
-
-    public void setDislikes(Set<CustomUserDetails> dislikes) {
-        this.dislikes = dislikes;
-    }
-
     // konstruktor so parent (koga e reply)
     public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited,
@@ -171,6 +161,11 @@ public class Post {
         this.timeLastEdited = LocalDateTime.now();
         this.parent = null;
         this.children = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return this.postId.toString();
     }
 
 }

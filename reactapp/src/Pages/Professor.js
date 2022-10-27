@@ -24,35 +24,36 @@ import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { CurrentPageNav } from "../Components/Styled/Main.style";
 
-function Professor(user, userLoaded) {
+function Professor() {
   let params = useParams();
-
-  let [professor, setProfessor] = useState(null);
-  let [loaded, setLoaded] = useState(null);
-  let [postModalDisplay, setPostModalDisplay] = useState("none");
   let navigate = useNavigate();
+
+  const [professor, setProfessor] = useState(null);
+  const [loadedProfessor, setLoadedProfessor] = useState(false);
+
+  const [postModalDisplay, setPostModalDisplay] = useState("none");
   const { auth, setAuth } = useContext(AuthApi);
-  const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [fetchError, setFetchError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
 
-    const fetchData = async () => {
+    const fetchProfessor = async () => {
       try {
         const response = await fetch(url);
         var cyclicGraph = await response.json();
         var jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
         setProfessor(cyclicGraph);
-        setLoaded(true);
+        setLoadedProfessor(true);
       } catch (error) {
         setFetchError(true);
       }
     };
 
-    fetchData();
+    fetchProfessor();
   }, [params.professorId]);
 
   const handleAddOpinionButtonClick = () => {
@@ -70,30 +71,29 @@ function Professor(user, userLoaded) {
   const handlePostSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await axios(
-      `http://192.168.0.17:8080/secure/professor/${professor.professorId}/addOpinion`,
-      {
-        method: "post",
-        data: {
-          title: postTitle,
-          content: postContent,
-        },
-        withCredentials: true,
-      }
-    );
-
-    window.location.reload(false);
-  };
-
-  const handleTitleChange = (e) => {
-    setPostTitle(e.target.value);
+    if (!postContent.length < 1) {
+      const response = await axios(
+        `http://192.168.0.17:8080/secure/professor/${params.professorId}/addOpinion`,
+        {
+          method: "post",
+          data: {
+            content: postContent,
+          },
+          withCredentials: true,
+        }
+      );
+      setErrorMessage("");
+      window.location.reload(false);
+    } else {
+      setErrorMessage("Полето за содржина не смее да биде празно");
+    }
   };
 
   const handleContentChange = (e) => {
     setPostContent(e.target.value);
   };
 
-  if (loaded) {
+  if (loadedProfessor) {
     return (
       <div>
         <CurrentPageNav>
@@ -119,7 +119,7 @@ function Professor(user, userLoaded) {
             </ProfessorCardDetails>
           </div>
         </ProfessorCard>
-        <div style={{ height: "20px", marginBottom: "30px" }}>
+        <div style={{ height: "20px", marginBottom: "50px" }}>
           <h3
             style={{
               float: "left",
@@ -145,15 +145,6 @@ function Professor(user, userLoaded) {
             </ModalHeader>
             <form onSubmit={handlePostSubmit}>
               <ModalBody>
-                <label htmlFor="title">
-                  <b>Наслов</b>:
-                  <ModalInput
-                    id="title"
-                    type="text"
-                    value={postTitle}
-                    onChange={handleTitleChange}
-                  />
-                </label>
                 <label htmlFor="content">
                   <b>Содржина</b>:
                   <ModalTextarea
@@ -165,17 +156,18 @@ function Professor(user, userLoaded) {
                   />
                 </label>
               </ModalBody>
+              <p
+                style={{ color: "red", marginLeft: "15px", marginTop: "10px" }}
+              >
+                {errorMessage}
+              </p>
               <ModalFooter type="submit">ОБЈАВИ</ModalFooter>
             </form>
           </ModalContent>
         </Modal>
 
         <div className="opinionTree">
-          <OpinionTree
-            professor={professor}
-            user={user}
-            userLoaded={userLoaded}
-          />
+          <OpinionTree professor={professor} />
         </div>
         <Outlet />
       </div>

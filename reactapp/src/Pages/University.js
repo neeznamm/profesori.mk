@@ -17,7 +17,7 @@ import { CurrentPageNav } from "../Components/Styled/Main.style";
 const University = () => {
   let params = useParams();
   const [loaded, setLoaded] = useState(false);
-  const [faculties, setFaculties] = useState(false);
+  const [faculties, setFaculties] = useState(null);
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const University = () => {
     fetchData();
   }, [params.universityId]);
 
-  return loaded ? (
+  return loaded && !fetchError && faculties.length !== 0 ? (
     <>
       <CurrentPageNav>
         &#187; <a href="#">{faculties[0].university.universityName}</a>
@@ -73,7 +73,7 @@ const University = () => {
                 <a href={"/faculty/" + faculty.facultyId}>
                   {faculty.facultyName}
                 </a>
-                <EntityParam>
+                <EntityParam right="30px">
                   {totalSections}{" "}
                   {totalSections !== 1 ? (
                     <span style={{ fontWeight: "normal" }}>секции,</span>
@@ -102,7 +102,7 @@ const University = () => {
         })}
       </div>
     </>
-  ) : !fetchError ? (
+  ) : !fetchError && !loaded ? (
     <div>
       <p style={{ marginTop: "140px" }}>се вчитува...</p>
       <Outlet />

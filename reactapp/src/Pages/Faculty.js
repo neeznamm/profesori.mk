@@ -59,7 +59,7 @@ const Faculty = () => {
     fetchDataStudyProgrammes();
   }, [params.facultyId]);
 
-  return loadedProfessors ? (
+  return loadedProfessors && professors.length != 0 ? (
     entityType === 0 ? (
       <>
         <CurrentPageNav>
@@ -113,7 +113,7 @@ const Faculty = () => {
                   <a href={"/professor/" + professor.professorId}>
                     {professor.professorName}
                   </a>
-                  <EntityParam>
+                  <EntityParam right="30px">
                     {totalPosts !== 1 ? (
                       totalPosts !== 0 ? (
                         <span
@@ -167,6 +167,7 @@ const Faculty = () => {
       loadedStudyProgrammes && (
         <>
           <CurrentPageNav>
+            &#187;{" "}
             <a
               href={
                 "/university/" + professors[0].faculty.university.universityId
@@ -174,7 +175,7 @@ const Faculty = () => {
             >
               {professors[0].faculty.university.universityName}
             </a>{" "}
-            / <a href="#">{professors[0].faculty.facultyName}</a>
+            &#187; <a href="#">{professors[0].faculty.facultyName}</a>
           </CurrentPageNav>
           <ProfessorCard>
             <ProfessorCardName>
@@ -220,7 +221,7 @@ const Faculty = () => {
         </>
       )
     )
-  ) : !fetchError ? (
+  ) : !fetchError && !loadedProfessors ? (
     <div>
       <p style={{ marginTop: "140px" }}>се вчитува...</p>
       <Outlet />

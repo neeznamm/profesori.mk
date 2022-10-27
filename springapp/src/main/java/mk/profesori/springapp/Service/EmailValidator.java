@@ -12,7 +12,7 @@ public class EmailValidator implements Predicate<String> {
     @Override
     public boolean test(String email) {
         
-        String regex = "^(.+)@(.+)$";
+        String regex = "^(.+)@(.+)$"; //TODO bilosto@@ ->> illegal address exception od mailsender
 
         Pattern pattern = Pattern.compile(regex);
 

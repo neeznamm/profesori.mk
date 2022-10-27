@@ -23,7 +23,7 @@ function Home({ user, userLoaded }) {
         <MainTitle>profesori.mk</MainTitle>
       </a>{" "}
       <Search />
-      {auth && <UserHeader user={user} userLoaded={userLoaded} />}
+      {auth && <UserHeader />}
       <div style={{ marginTop: "140px" }}></div>
       <Outlet />
     </MainWrapper>

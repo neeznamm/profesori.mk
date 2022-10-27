@@ -17,6 +17,7 @@ export const OpinionCardContent = styled.div`
     background-color: seashell;
   }
   position: relative;
+  overflow-wrap: break-word;
 `;
 
 export const OpinionCardContentTitle = styled.p`
@@ -54,12 +55,13 @@ export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   color: ${(props) => props.color};
   display: block;
   position: absolute;
+  height: 20px;
   top: 50%;
   transform: translateY(-50%);
   right: ${(props) => props.right};
   transition: 0.5s;
   &:hover {
-    color: ${(props) => props.color};
+    opacity: 0.5;
     cursor: pointer;
   }
 `;

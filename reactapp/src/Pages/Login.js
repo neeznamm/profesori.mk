@@ -34,7 +34,10 @@ const Login = () => {
     );
     if (!response.request.responseURL.includes("error")) {
       // ako NE redirektira na /login?error
-      Cookies.set("JSESSIONID", response.data.sessionId);
+      var in30Minutes = 1 / 48;
+      Cookies.set("JSESSIONID", response.data.sessionId, {
+        expires: in30Minutes,
+      });
       setAuth(true);
       setErrMsg("");
     } else {

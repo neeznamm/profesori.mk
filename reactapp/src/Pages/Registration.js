@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import axios from "../api/axios";
 import {
   FieldConstraintModal,
@@ -6,9 +6,12 @@ import {
   LoginInput,
   RequiredAsterisk,
 } from "../Components/Styled/Login.style";
+import { Navigate } from "react-router-dom";
+import AuthApi from "../api/AuthApi";
 const REGISTRATION_URL = "/registration";
 
 const Registration = () => {
+  const { auth, setAuth } = useContext(AuthApi);
   const userRef = useRef();
   const errRef = useRef();
 
@@ -49,7 +52,9 @@ const Registration = () => {
   const [FieldConstraintModalOpacity2, setFieldConstraintModalOpacity2] =
     useState(0);
 
-  return registrationSuccessful === false ? (
+  return auth ? (
+    <Navigate to="/user_dashboard" />
+  ) : registrationSuccessful === false ? (
     <div
       style={{
         marginTop: "140px",

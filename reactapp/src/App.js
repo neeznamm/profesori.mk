@@ -11,38 +11,18 @@ import Faculty from "./Pages/Faculty";
 import { useEffect, useState, useMemo } from "react";
 import AuthApi from "./api/AuthApi";
 import Cookies from "js-cookie";
-import axios from "./api/axios";
-import JSOG from "jsog";
 import NotFound from "./Pages/NotFound";
+import Topic from "./Pages/Topic";
 
 export default function App() {
   const [auth, setAuth] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userLoaded, setUserLoaded] = useState(false);
   const variableAuth = useMemo(() => ({ auth, setAuth }), [auth]);
   const [authLoaded, setAuthLoaded] = useState(false);
-
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get(
-        "http://192.168.0.17:8080/secure/currentUser",
-        { withCredentials: true }
-      );
-      var cyclicGraph = await response.data;
-      var jsogStructure = JSOG.encode(cyclicGraph);
-      cyclicGraph = JSOG.decode(jsogStructure);
-      setUser(cyclicGraph);
-      setUserLoaded(true);
-    } catch (error) {
-      console.log("Fetching error", error);
-    }
-  };
 
   const readCookie = async () => {
     const session = Cookies.get("JSESSIONID");
     if (session) {
       setAuth(true);
-      fetchUser();
     } else {
       setAuth(false);
     }
@@ -50,6 +30,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    document.title = "profesori.mk";
     readCookie();
   }, []);
 
@@ -68,28 +49,21 @@ export default function App() {
     <AuthApi.Provider value={variableAuth}>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={<Home user={user} userLoaded={userLoaded} />}
-          >
+          <Route path="/" element={<Home />}>
             <Route path="login" element={<Login />}></Route>
             <Route path="registration" element={<Registration />}></Route>
             <Route path="professor">
-              <Route
-                path=":professorId"
-                element={<Professor user={user} userLoaded={userLoaded} />}
-              />
+              <Route path=":professorId" element={<Professor />} />
             </Route>
             <Route path="university/:universityId" element={<University />} />
             <Route path="faculty/:facultyId" element={<Faculty />} />
             <Route path="subject/:subjectId" element={<Subject />} />
+            <Route path="topic/:topicId" element={<Topic />} />
             <Route path="search" element={<SearchResults />}></Route>
             <Route
               path="user_dashboard"
               element={
-                <ProtectedRoute auth={auth}>
-                  {<UserDashboard user={user} userLoaded={userLoaded} />}
-                </ProtectedRoute>
+                <ProtectedRoute auth={auth}>{<UserDashboard />}</ProtectedRoute>
               }
             ></Route>
           </Route>

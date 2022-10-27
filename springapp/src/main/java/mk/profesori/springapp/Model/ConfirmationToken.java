@@ -11,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +22,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 public class ConfirmationToken {
-    
+
     @Id
     @SequenceGenerator(name = "confirmation_token_sequence", sequenceName = "confirmation_token_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "confirmation_token_sequence")
@@ -41,9 +45,9 @@ public class ConfirmationToken {
     @JoinColumn(nullable = false, name = "custom_user_details_id")
     private CustomUserDetails customUserDetails;
 
-    public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiredAt, 
-    CustomUserDetails customUserDetails) {
-        
+    public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiredAt,
+            CustomUserDetails customUserDetails) {
+
         this.token = token;
         this.createdAt = createdAt;
         this.expiresAt = expiredAt;

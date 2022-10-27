@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -40,9 +39,6 @@ public class StudyProgramme {
     @OneToMany(mappedBy = "studyProgramme")
     private Set<Subject> subjects = new HashSet<>();
 
-    @OneToOne(mappedBy = "relatedStudyProgramme")
-    private Section relatedSection;
-
     // getters
     public Long getStudyProgrammeId() {
         return studyProgrammeId;
@@ -64,7 +60,4 @@ public class StudyProgramme {
         return subjects;
     }
 
-    public Section getRelatedSection() {
-        return relatedSection;
-    }
 }
