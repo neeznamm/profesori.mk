@@ -2,8 +2,10 @@ package mk.profesori.springapp.Service;
 
 import mk.profesori.springapp.Model.*;
 import mk.profesori.springapp.Repository.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +22,9 @@ public class MainService {
     private final SubjectRepository subjectRepository;
     private final PostVoteRepository postVoteRepository;
     private final UserRepository userRepository;
+    private final PostReportRepository postReportRepository;
 
-    public MainService(ProfessorRepository professorRepository, StudyProgrammeRepository studyProgrammeRepository, FacultyRepository facultyRepository, UniversityRepository universityRepository, CityRepository cityRepository, OpinionRepository opinionRepository, _ThreadRepository _threadRepository, SubjectRepository subjectRepository, PostVoteRepository postVoteRepository, UserRepository userRepository) {
+    public MainService(ProfessorRepository professorRepository, StudyProgrammeRepository studyProgrammeRepository, FacultyRepository facultyRepository, UniversityRepository universityRepository, CityRepository cityRepository, OpinionRepository opinionRepository, _ThreadRepository _threadRepository, SubjectRepository subjectRepository, PostVoteRepository postVoteRepository, UserRepository userRepository, PostReportRepository postReportRepository) {
         this.professorRepository = professorRepository;
         this.studyProgrammeRepository = studyProgrammeRepository;
         this.facultyRepository = facultyRepository;
@@ -32,6 +35,7 @@ public class MainService {
         this.subjectRepository = subjectRepository;
         this.postVoteRepository = postVoteRepository;
         this.userRepository = userRepository;
+        this.postReportRepository = postReportRepository;
     }
 
     public List<Professor> getAllProfessors() {
@@ -182,7 +186,6 @@ public class MainService {
         postVoteRepository.save(voteToAdd);
         targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()+1);
         userRepository.save(targetPost.getAuthor());
-
     }
     public void downvote_Thread(Long postId, CustomUserDetails currentUser) {
         Post targetPost = _threadRepository.findByPostId(postId);
@@ -190,5 +193,101 @@ public class MainService {
         postVoteRepository.save(voteToAdd);
         targetPost.getAuthor().setKarma(targetPost.getAuthor().getKarma()-1);
         userRepository.save(targetPost.getAuthor());
+    }
+
+    public void deleteOpinion(Long postId) {opinionRepository.deleteById(postId);}
+    public void delete_Thread(Long postId) {_threadRepository.deleteById(postId);}
+
+    public void updateOpinion(String newContent, Long newTargetProfessorId, Long postId) {
+        Opinion opinionToUpdate = opinionRepository.findByPostId(postId);
+
+        opinionToUpdate.setContent(newContent);
+
+        Professor newTargetProfessor = professorRepository.findByProfessorId(newTargetProfessorId);
+        opinionToUpdate.setTargetProfessor(newTargetProfessor); //opcijava da ja dava samo kaj postovi so parentPost==null
+        for(Post p : opinionToUpdate.getChildren()) {
+            Opinion o = (Opinion) p;
+            o.setTargetProfessor(newTargetProfessor);
+        }
+        opinionToUpdate.setTimeLastEdited(LocalDateTime.now());
+        opinionRepository.save(opinionToUpdate);
+    }
+
+    public void update_Thread(String newTitle, String newContent, Long newTargetSubjectId, Long newParentThreadId, Long postId) {
+        _Thread _threadToUpdate = _threadRepository.findByPostId(postId);
+
+        _threadToUpdate.setContent(newContent);
+
+        Subject newTargetSubject = subjectRepository.findBySubjectId(newTargetSubjectId);
+        _threadToUpdate.setTargetSubject(newTargetSubject);
+
+        if(newParentThreadId != null) { //samo ako e specificirano
+            _Thread newParentThread = _threadRepository.findByPostId(newParentThreadId);
+
+            if (_threadToUpdate.getParent() == null || _threadToUpdate.getParent().getPostId().equals(postId)) {
+                _threadToUpdate.setParent(newParentThread);
+            }//samo ako e naslovniot post ili directChild
+            } else if(_threadToUpdate.getParent() != null) {
+            _threadToUpdate.setParent(null);
+            }
+
+            if(_threadToUpdate.getParent() == null) {
+             _threadToUpdate.setTitle(newTitle);
+            } else {
+             _threadToUpdate.setTitle(null);
+             }
+
+         for(Post p : _threadToUpdate.getChildren()) {
+                _Thread t = (_Thread) p;
+                t.setTargetSubject(newTargetSubject);
+            }
+         _threadToUpdate.setTimeLastEdited(LocalDateTime.now());
+          _threadRepository.save(_threadToUpdate);
+    }
+
+    public void lockUser(Long userId) {
+        CustomUserDetails user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Invalid userId"));
+        user.setLocked(true);
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+
+    public void updateUserFullName(String newFullName, Long userId) {
+        CustomUserDetails user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Invalid userId"));
+        user.setFullName(newFullName);
+        userRepository.save(user);
+    }
+
+    public void updateUserUsername(String newUsername, Long userId) {
+        CustomUserDetails user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Invalid userId"));
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
+
+    public void reportOpinion(Long postId, CustomUserDetails currentUser, String description) {
+            Post targetPost = opinionRepository.findByPostId(postId);
+            PostReport reportToAdd = new PostReport(currentUser, targetPost, description);
+            postReportRepository.save(reportToAdd);
+    }
+
+    public void markReport(Long postReportId, String action) {
+        PostReport report = postReportRepository.findByPostReportId(postReportId);
+        if (action.equals("resolve")) report.setResolved(true);
+        else if (action.equals("open")) report.setResolved(false);
+     }
+
+    public List<PostReport> getAllPostReports() {
+        return postReportRepository.findAll();
+    }
+
+    public void reportThread(Long postId, CustomUserDetails currentUser, String description) {
+        Post targetPost = _threadRepository.findByPostId(postId);
+        PostReport reportToAdd = new PostReport(currentUser, targetPost, description);
+        postReportRepository.save(reportToAdd);
     }
 }

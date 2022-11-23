@@ -1,30 +1,15 @@
 package mk.profesori.springapp.Model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.voodoodyne.jackson.jsog.JSOGGenerator;
-
-import lombok.NoArgsConstructor;
 
 @Entity(name = "post")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -58,9 +43,24 @@ public class Post {
     @JoinColumn(name = "parent_post_id")
     private Post parent;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostVote> votes = new HashSet<>();
 
+    @OneToMany(mappedBy = "post", cascade={CascadeType.PERSIST})
+    private Set<PostReport> reports = new HashSet<>();
+    @PreRemove
+    public void preRemove() {
+        reports.forEach(report -> {
+            report.setPost(null);
+            report.setResolved(true);
+        });
+    }
+
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> children = new ArrayList<>();
+
+    // getters and setters
     public Set<PostVote> getVotes() {
         return votes;
     }
@@ -68,11 +68,6 @@ public class Post {
     public void setVotes(Set<PostVote> votes) {
         this.votes = votes;
     }
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Post> children = new ArrayList<>();
-
-    // getters and setters
     public Long getPostId() {
         return postId;
     }
@@ -167,5 +162,6 @@ public class Post {
     public String toString() {
         return this.postId.toString();
     }
+
 
 }

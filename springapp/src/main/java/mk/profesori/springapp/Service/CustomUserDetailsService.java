@@ -42,9 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         userRepository.save(customUserDetails);
 
-        String token = createToken(customUserDetails);
-
-        return token;
+        return createToken(customUserDetails);
     }
 
     public String createToken(CustomUserDetails customUserDetails) {
@@ -59,7 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return token;
     }
 
-    public int enableUser(String email) {
-        return userRepository.enableUser(email);
+    public void enableUser(String email) {
+        userRepository.enableUser(email);
     }
 }

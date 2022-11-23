@@ -45,7 +45,7 @@ const Subject = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/public/subject/${params.subjectId}`;
+    const url = `http://192.168.0.19:8080/public/subject/${params.subjectId}`;
 
     const fetchData = async () => {
       try {
@@ -66,6 +66,7 @@ const Subject = () => {
   const handleAddTopicButtonClick = () => {
     if (auth) {
       setTopicModalDisplay("block");
+      document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
@@ -73,6 +74,7 @@ const Subject = () => {
 
   const handleModalCloseClick = () => {
     setTopicModalDisplay("none");
+    document.body.style.overflowY = "auto";
   };
 
   const handleTopicSubmit = async (e) => {
@@ -80,7 +82,7 @@ const Subject = () => {
 
     if (!topicTitle.length < 1 && !topicContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.17:8080/secure/subject/${params.subjectId}/addThread`,
+        `http://192.168.0.19:8080/secure/subject/${params.subjectId}/addThread`,
         {
           method: "post",
           data: {
@@ -177,6 +179,7 @@ const Subject = () => {
                   id="title"
                   value={topicTitle}
                   onChange={handleTitleChange}
+                  spellCheck={false}
                 />
               </label>
               <label htmlFor="content">
@@ -187,6 +190,7 @@ const Subject = () => {
                   cols="100"
                   value={topicContent}
                   onChange={handleContentChange}
+                  spellCheck={false}
                 />
               </label>
             </ModalBody>

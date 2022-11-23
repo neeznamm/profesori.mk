@@ -47,8 +47,8 @@ const Topic = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url1 = `http://192.168.0.17:8080/public/thread/${params.topicId}`;
-    const url2 = `http://192.168.0.17:8080/secure/currentUser`;
+    const url1 = `http://192.168.0.19:8080/public/thread/${params.topicId}`;
+    const url2 = `http://192.168.0.19:8080/secure/currentUser`;
 
     const fetchTopic = async () => {
       try {
@@ -83,6 +83,7 @@ const Topic = () => {
     if (auth) {
       setReplyModalDisplay("block");
       setPostForModal(post);
+      document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
@@ -97,7 +98,7 @@ const Topic = () => {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.17:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
+        `http://192.168.0.19:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
         {
           method: "post",
           data: {
@@ -116,6 +117,7 @@ const Topic = () => {
   const handleAddOpinionButtonClick = () => {
     if (auth) {
       setPostModalDisplay("block");
+      document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
@@ -125,7 +127,7 @@ const Topic = () => {
     e.preventDefault();
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.17:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
+        `http://192.168.0.19:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
         {
           method: "post",
           data: {
@@ -143,6 +145,7 @@ const Topic = () => {
   const handleModalCloseClick = () => {
     setPostModalDisplay("none");
     setReplyModalDisplay("none");
+    document.body.style.overflowY = "auto";
   };
   const handleContentChange = (e) => {
     setPostContent(e.target.value);
@@ -156,7 +159,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.17:8080/secure/upvoteThread/${post.postId}`,
+          `http://192.168.0.19:8080/secure/upvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -179,7 +182,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.17:8080/secure/downvoteThread/${post.postId}`,
+          `http://192.168.0.19:8080/secure/downvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -209,11 +212,20 @@ const Topic = () => {
             <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
               {child.content}
             </p>
-            <OpinionReplyCardContentTime>
-              {dateConverter(
-                new Date(child.timePosted).toString().slice(4, -43)
-              )}
-            </OpinionReplyCardContentTime>
+            {thread.timePosted === thread.timeLastEdited ? (
+              <OpinionCardContentTime>
+                {dateConverter(
+                  new Date(thread.timePosted).toString().slice(4, -43)
+                )}
+              </OpinionCardContentTime>
+            ) : (
+              <OpinionCardContentTime>
+                {dateConverter(
+                  new Date(thread.timeLastEdited).toString().slice(4, -43)
+                )}{" "}
+                (едитирано од модератор)
+              </OpinionCardContentTime>
+            )}
 
             <div
               style={{
@@ -231,7 +243,7 @@ const Topic = () => {
                     ? child.votes.some(
                         (e) => e.vote === "UPVOTE" && e.user.id === user.id
                       )
-                      ? "greenyellow"
+                      ? "green"
                       : "darkgrey"
                     : "darkgrey"
                 }
@@ -336,6 +348,7 @@ const Topic = () => {
                   cols="100"
                   value={postContent}
                   onChange={handleContentChange}
+                  spellCheck={false}
                 />
               </label>
             </ModalBody>
@@ -355,11 +368,20 @@ const Topic = () => {
           <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
             {thread.content}
           </p>
-          <OpinionCardContentTime>
-            {dateConverter(
-              new Date(thread.timePosted).toString().slice(4, -43)
-            )}
-          </OpinionCardContentTime>
+          {thread.timePosted === thread.timeLastEdited ? (
+            <OpinionCardContentTime>
+              {dateConverter(
+                new Date(thread.timePosted).toString().slice(4, -43)
+              )}
+            </OpinionCardContentTime>
+          ) : (
+            <OpinionCardContentTime>
+              {dateConverter(
+                new Date(thread.timeLastEdited).toString().slice(4, -43)
+              )}{" "}
+              (едитирано од модератор)
+            </OpinionCardContentTime>
+          )}
           <div
             style={{
               display:
@@ -376,7 +398,7 @@ const Topic = () => {
                   ? thread.votes.some(
                       (e) => e.vote === "UPVOTE" && e.user.id === user.id
                     )
-                    ? "greenyellow"
+                    ? "green"
                     : "darkgrey"
                   : "darkgrey"
               }
@@ -421,11 +443,22 @@ const Topic = () => {
               <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
                 {directChild.content}
               </p>
-              <OpinionCardContentTime>
-                {dateConverter(
-                  new Date(directChild.timePosted).toString().slice(4, -43)
-                )}
-              </OpinionCardContentTime>
+              {directChild.timePosted === directChild.timeLastEdited ? (
+                <OpinionCardContentTime>
+                  {dateConverter(
+                    new Date(directChild.timePosted).toString().slice(4, -43)
+                  )}
+                </OpinionCardContentTime>
+              ) : (
+                <OpinionCardContentTime>
+                  {dateConverter(
+                    new Date(directChild.timeLastEdited)
+                      .toString()
+                      .slice(4, -43)
+                  )}{" "}
+                  (едитирано од модератор)
+                </OpinionCardContentTime>
+              )}
               <div
                 style={{
                   display:
@@ -443,7 +476,7 @@ const Topic = () => {
                       ? directChild.votes.some(
                           (e) => e.vote === "UPVOTE" && e.user.id === user.id
                         )
-                        ? "greenyellow"
+                        ? "green"
                         : "darkgrey"
                       : "darkgrey"
                   }

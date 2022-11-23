@@ -26,8 +26,8 @@ const Faculty = () => {
   const [entityType, setEntityType] = useState(0);
 
   useEffect(() => {
-    const urlProfessors = `http://192.168.0.17:8080/public/professors?facultyId=${params.facultyId}`;
-    const urlStudyProgrammes = `http://192.168.0.17:8080/public/study_programmes?facultyId=${params.facultyId}`;
+    const urlProfessors = `http://192.168.0.19:8080/public/professors?facultyId=${params.facultyId}`;
+    const urlStudyProgrammes = `http://192.168.0.19:8080/public/study_programmes?facultyId=${params.facultyId}`;
 
     const fetchDataProfessors = async () => {
       try {

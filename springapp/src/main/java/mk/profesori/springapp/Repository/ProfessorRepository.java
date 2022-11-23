@@ -12,11 +12,11 @@ import mk.profesori.springapp.Model.Professor;
 @Repository
 public interface ProfessorRepository extends CrudRepository<Professor, Long>, JpaSpecificationExecutor<Professor> {
 
-    public List<Professor> findAll();
+    List<Professor> findAll();
 
-    public Professor findByProfessorId(Long id);
+    Professor findByProfessorId(Long id);
 
-    public List<Professor> findByFaculty(Faculty faculty);
+    List<Professor> findByFaculty(Faculty faculty);
 
-    public List<Professor> findByProfessorNameContainingIgnoreCase(String name);
+    List<Professor> findByProfessorNameContainingIgnoreCase(String name);
 }

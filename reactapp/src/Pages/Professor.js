@@ -38,7 +38,7 @@ function Professor() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/public/professor/${params.professorId}`;
+    const url = `http://192.168.0.19:8080/public/professor/${params.professorId}`;
 
     const fetchProfessor = async () => {
       try {
@@ -59,6 +59,7 @@ function Professor() {
   const handleAddOpinionButtonClick = () => {
     if (auth) {
       setPostModalDisplay("block");
+      document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
@@ -66,6 +67,7 @@ function Professor() {
 
   const handleModalCloseClick = () => {
     setPostModalDisplay("none");
+    document.body.style.overflowY = "auto";
   };
 
   const handlePostSubmit = async (e) => {
@@ -73,7 +75,7 @@ function Professor() {
 
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.17:8080/secure/professor/${params.professorId}/addOpinion`,
+        `http://192.168.0.19:8080/secure/professor/${params.professorId}/addOpinion`,
         {
           method: "post",
           data: {
@@ -151,6 +153,7 @@ function Professor() {
                     id="content"
                     rows="8"
                     cols="100"
+                    spellCheck={false}
                     value={postContent}
                     onChange={handleContentChange}
                   />

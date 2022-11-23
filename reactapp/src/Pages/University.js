@@ -21,7 +21,7 @@ const University = () => {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/public/faculties?universityId=${params.universityId}`;
+    const url = `http://192.168.0.19:8080/public/faculties?universityId=${params.universityId}`;
 
     const fetchData = async () => {
       try {

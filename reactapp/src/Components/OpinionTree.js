@@ -41,7 +41,7 @@ function OpinionTree({ professor }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.17:8080/secure/currentUser`;
+    const url = `http://192.168.0.19:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -67,7 +67,7 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.17:8080/secure/upvoteOpinion/${post.postId}`,
+          `http://192.168.0.19:8080/secure/upvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -90,7 +90,7 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.17:8080/secure/downvoteOpinion/${post.postId}`,
+          `http://192.168.0.19:8080/secure/downvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -110,6 +110,7 @@ function OpinionTree({ professor }) {
     if (auth) {
       setReplyModalDisplay("block");
       setPostForModal(opinion);
+      document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
@@ -117,6 +118,7 @@ function OpinionTree({ professor }) {
 
   const handleModalCloseClick = () => {
     setReplyModalDisplay("none");
+    document.body.style.overflowY = "auto";
   };
 
   const handleContentChange = (e) => {
@@ -128,7 +130,7 @@ function OpinionTree({ professor }) {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.17:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
+        `http://192.168.0.19:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
         {
           method: "post",
           data: {
@@ -158,11 +160,20 @@ function OpinionTree({ professor }) {
             <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
               {child.content}
             </p>
-            <OpinionReplyCardContentTime>
-              {dateConverter(
-                new Date(child.timePosted).toString().slice(4, -43)
-              )}
-            </OpinionReplyCardContentTime>
+            {child.timePosted === child.timeLastEdited ? (
+              <OpinionCardContentTime>
+                {dateConverter(
+                  new Date(child.timePosted).toString().slice(4, -43)
+                )}
+              </OpinionCardContentTime>
+            ) : (
+              <OpinionCardContentTime>
+                {dateConverter(
+                  new Date(child.timeLastEdited).toString().slice(4, -43)
+                )}{" "}
+                (едитирано од модератор)
+              </OpinionCardContentTime>
+            )}
 
             <div
               style={{
@@ -180,7 +191,7 @@ function OpinionTree({ professor }) {
                     ? child.votes.some(
                         (e) => e.vote === "UPVOTE" && e.user.id === user.id
                       )
-                      ? "greenyellow"
+                      ? "green"
                       : "darkgrey"
                     : "darkgrey"
                 }
@@ -248,11 +259,22 @@ function OpinionTree({ professor }) {
                   <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
                     {opinion.content}
                   </p>
-                  <OpinionCardContentTime>
-                    {dateConverter(
-                      new Date(opinion.timePosted).toString().slice(4, -43)
-                    )}
-                  </OpinionCardContentTime>
+                  {opinion.timePosted === opinion.timeLastEdited ? (
+                    <OpinionCardContentTime>
+                      {dateConverter(
+                        new Date(opinion.timePosted).toString().slice(4, -43)
+                      )}
+                    </OpinionCardContentTime>
+                  ) : (
+                    <OpinionCardContentTime>
+                      {dateConverter(
+                        new Date(opinion.timeLastEdited)
+                          .toString()
+                          .slice(4, -43)
+                      )}{" "}
+                      (едитирано од модератор)
+                    </OpinionCardContentTime>
+                  )}
 
                   <div
                     style={{
@@ -272,7 +294,7 @@ function OpinionTree({ professor }) {
                               (e) =>
                                 e.vote === "UPVOTE" && e.user.id === user.id
                             )
-                            ? "greenyellow"
+                            ? "green"
                             : "darkgrey"
                           : "darkgrey"
                       }
@@ -342,6 +364,7 @@ function OpinionTree({ professor }) {
                     cols="100"
                     value={replyContent}
                     onChange={handleContentChange}
+                    spellCheck={false}
                   />
                 </label>
               </ModalBody>

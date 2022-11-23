@@ -39,8 +39,8 @@ public class Opinion extends Post {
     public Professor getTargetProfessor() {
         return targetProfessor;
     }
-
     public void setTargetProfessor(Professor targetProfessor) {
         this.targetProfessor = targetProfessor;
     }
+
 }

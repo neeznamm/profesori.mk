@@ -40,4 +40,7 @@ public class _Thread extends Post {
         return targetSubject;
     }
 
+    public void setTargetSubject(Subject targetSubject) {
+        this.targetSubject = targetSubject;
+    }
 }

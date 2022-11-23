@@ -28,30 +28,31 @@ public class CustomUserDetails implements UserDetails {
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
     private Long id;
-    private String fullName; // opcionalno, smee da e prazno
+    private String fullName;
     private String username;
     private String email;
-    private String password; // TODO dont expose password in api
+    private String password; // TODO
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private Boolean locked = false;
     private Boolean enabled = false;
-    @OneToMany(mappedBy = "customUserDetails", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "customUserDetails", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Post> authoredPosts = new HashSet<>();
     private Integer karma = 0;
 
-    public Set<PostVote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<PostVote> votes) {
-        this.votes = votes;
-    }
-
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostVote> votes = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
+    private Set<PostReport> reportsSubmitted = new HashSet<>();
+    @PreRemove
+    public void preRemove() {
+        reportsSubmitted.forEach(report -> {
+            report.setUser(null);
+        });
+    }
 
     public CustomUserDetails(String fullName, String username, String email, String password, UserRole userRole) {
         this.fullName = fullName;
@@ -114,4 +115,15 @@ public class CustomUserDetails implements UserDetails {
         return this.id.toString();
     }
 
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public Set<PostVote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<PostVote> votes) {
+        this.votes = votes;
+    }
 }

@@ -10,6 +10,6 @@ import mk.profesori.springapp.Model.City;
 @Repository
 public interface CityRepository extends CrudRepository<City, Long>{
 
-    public List<City> findAll();
-    public City findByCityId(Long id);
+    List<City> findAll();
+    City findByCityId(Long id);
 }

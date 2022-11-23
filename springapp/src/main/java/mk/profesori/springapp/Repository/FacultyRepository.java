@@ -11,7 +11,7 @@ import mk.profesori.springapp.Model.University;
 @Repository
 public interface FacultyRepository extends CrudRepository<Faculty, Long>{
 
-    public List<Faculty> findAll();
-    public Faculty findByFacultyId(Long id);
-    public List<Faculty> findByUniversity(University university);
+    List<Faculty> findAll();
+    Faculty findByFacultyId(Long id);
+    List<Faculty> findByUniversity(University university);
 }

@@ -12,7 +12,7 @@ import mk.profesori.springapp.Model.StudyProgramme;
 @Repository
 public interface StudyProgrammeRepository extends CrudRepository<StudyProgramme, Long>{
     
-    public List<StudyProgramme> findAll();
-    public StudyProgramme findByStudyProgrammeId(Long id);
-    public List<StudyProgramme> findByFaculty(Faculty faculty);
+    List<StudyProgramme> findAll();
+    StudyProgramme findByStudyProgrammeId(Long id);
+    List<StudyProgramme> findByFaculty(Faculty faculty);
 }
