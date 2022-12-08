@@ -13,6 +13,7 @@ import AuthApi from "./api/AuthApi";
 import Cookies from "js-cookie";
 import NotFound from "./Pages/NotFound";
 import Topic from "./Pages/Topic";
+import LoadingSpinner from "./Components/Styled/LoadingSpinner.style";
 
 export default function App() {
   const [auth, setAuth] = useState(false);
@@ -41,7 +42,7 @@ export default function App() {
       }
       return children;
     } else {
-      return <div>се вчитува cookie...</div>;
+      return <LoadingSpinner/>;
     }
   };
 

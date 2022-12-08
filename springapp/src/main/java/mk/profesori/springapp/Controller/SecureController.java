@@ -5,6 +5,8 @@ import mk.profesori.springapp.Model.CustomUserDetails;
 import mk.profesori.springapp.Model.PostReport;
 import mk.profesori.springapp.Model.UserRole;
 import mk.profesori.springapp.Service.CustomUserDetailsService;
+import mk.profesori.springapp.Service.DisallowedOperationException;
+import mk.profesori.springapp.Service.IncompatiblePostId;
 import mk.profesori.springapp.Service.MainService;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.security.core.Authentication;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.0.19:3000", "http://192.168.0.39:3000" })
+@CrossOrigin(origins = { "http://192.168.0.29:3000", "http://192.168.0.28:3000" })
 public class SecureController {
 
     private final MainService mainService;
@@ -132,19 +134,26 @@ public class SecureController {
     }
 
     @RequestMapping(value = "/updateOpinion/{postId}", method = RequestMethod.PUT)
-    public void updateOpinion(@RequestBody ObjectNode objectNode, @PathVariable Long postId,
+    public String updateOpinion(@RequestBody ObjectNode objectNode, @PathVariable Long postId,
             @CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser
                 && currentUser.getUserRole().equals(UserRole.MODERATOR)) {
             String newContent = objectNode.get("newContent").asText();
             Long newTargetProfessorId = objectNode.get("newTargetProfessorId").asLong();
-            mainService.updateOpinion(newContent, newTargetProfessorId, postId);
+            Long newParentPostId = objectNode.get("newParentPostId").asLong();
+            try {
+                mainService.updateOpinion(newContent, newTargetProfessorId, newParentPostId, postId);
+            } catch (IncompatiblePostId | DisallowedOperationException e) {
+                return e.getMessage();
+            }
         }
+
+        return null;
     }
 
     @RequestMapping(value = "/updateThread/{postId}", method = RequestMethod.PUT)
-    public void updateThread(@RequestBody ObjectNode objectNode, @PathVariable Long postId,
+    public String updateThread(@RequestBody ObjectNode objectNode, @PathVariable Long postId,
             @CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser
@@ -152,14 +161,15 @@ public class SecureController {
             String newTitle = objectNode.get("newTitle").asText();
             String newContent = objectNode.get("newContent").asText();
             Long newTargetSubjectId = objectNode.get("newTargetSubjectId").asLong();
-
-            if (objectNode.has("newParentThreadId")) {
-                Long newParentThreadId = objectNode.get("newParentThreadId").asLong();
+            Long newParentThreadId = objectNode.get("newParentThreadId").asLong();
+            try {
                 mainService.update_Thread(newTitle, newContent, newTargetSubjectId, newParentThreadId, postId);
-            } else {
-                mainService.update_Thread(newTitle, newContent, newTargetSubjectId, null, postId);
+            } catch (IncompatiblePostId | DisallowedOperationException e) {
+                return e.getMessage();
             }
         }
+
+        return null;
     }
 
     @RequestMapping(value = "/lockUser/{userId}", method = RequestMethod.GET)
@@ -222,10 +232,11 @@ public class SecureController {
         }
     }
 
-    @RequestMapping(value = "/markReportResolved/{postReportId}/", method = RequestMethod.GET)
+    @RequestMapping(value = "/markReportResolved/{postReportId}/{action}", method = RequestMethod.GET)
     public void markReportResolved(@PathVariable Long postReportId, @PathVariable String action, @CurrentSecurityContext SecurityContext context) {
         Authentication authentication = context.getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser &&
+                currentUser.getUserRole().equals(UserRole.MODERATOR)) {
             mainService.markReport(postReportId, action);
         }
     }

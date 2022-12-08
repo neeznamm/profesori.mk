@@ -16,7 +16,7 @@ const Login = () => {
   const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
-    userRef.current.focus();
+    if (!auth) userRef.current.focus();
   }, []);
 
   const handleSubmit = async (e) => {

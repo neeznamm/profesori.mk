@@ -24,7 +24,7 @@ import mk.profesori.springapp.Service.MainService;
 
 @RestController
 @RequestMapping("/public")
-@CrossOrigin(origins = { "http://192.168.0.19:3000", "http://192.168.0.39:3000" })
+@CrossOrigin(origins = { "http://192.168.0.29:3000", "http://192.168.0.28:3000" })
 public class PublicController {
 
     @Autowired

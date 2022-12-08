@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 export const ProfessorCard = styled.div`
-  background-color: cornsilk;
   width: auto;
   padding: 10px;
   margin-bottom: 30px;

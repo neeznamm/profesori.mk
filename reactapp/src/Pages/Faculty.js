@@ -15,6 +15,7 @@ import {
 } from "../Components/Styled/EntityList.style";
 import SubjectsAccordion from "../Components/SubjectsAccordion";
 import { CurrentPageNav } from "../Components/Styled/Main.style";
+import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 const Faculty = () => {
   let params = useParams();
@@ -26,8 +27,8 @@ const Faculty = () => {
   const [entityType, setEntityType] = useState(0);
 
   useEffect(() => {
-    const urlProfessors = `http://192.168.0.19:8080/public/professors?facultyId=${params.facultyId}`;
-    const urlStudyProgrammes = `http://192.168.0.19:8080/public/study_programmes?facultyId=${params.facultyId}`;
+    const urlProfessors = `http://192.168.0.29:8080/public/professors?facultyId=${params.facultyId}`;
+    const urlStudyProgrammes = `http://192.168.0.29:8080/public/study_programmes?facultyId=${params.facultyId}`;
 
     const fetchDataProfessors = async () => {
       try {
@@ -223,7 +224,7 @@ const Faculty = () => {
     )
   ) : !fetchError && !loadedProfessors ? (
     <div>
-      <p style={{ marginTop: "140px" }}>се вчитува...</p>
+      <LoadingSpinner style={{ marginTop: "140px" }}/>
       <Outlet />
     </div>
   ) : (

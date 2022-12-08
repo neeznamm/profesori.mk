@@ -23,6 +23,7 @@ import AuthApi from "../api/AuthApi";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { CurrentPageNav } from "../Components/Styled/Main.style";
+import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 function Professor() {
   let params = useParams();
@@ -38,7 +39,7 @@ function Professor() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/public/professor/${params.professorId}`;
+    const url = `http://192.168.0.29:8080/public/professor/${params.professorId}`;
 
     const fetchProfessor = async () => {
       try {
@@ -75,7 +76,7 @@ function Professor() {
 
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.19:8080/secure/professor/${params.professorId}/addOpinion`,
+        `http://192.168.0.29:8080/secure/professor/${params.professorId}/addOpinion`,
         {
           method: "post",
           data: {
@@ -85,7 +86,7 @@ function Professor() {
         }
       );
       setErrorMessage("");
-      window.location.reload(false);
+      window.location.reload();
     } else {
       setErrorMessage("Полето за содржина не смее да биде празно");
     }
@@ -110,7 +111,7 @@ function Professor() {
           &#187; <a href="#">{professor.professorName}</a>
         </CurrentPageNav>
         <ProfessorCard>
-          <ProfessorCardName>{professor.professorName}</ProfessorCardName>
+          <ProfessorCardName>{professor.professorName} <span style={{opacity:"50%", fontSize:"16px"}}>#{professor.professorId}</span></ProfessorCardName>
           <ProfessorCardSeparator />
           <div style={{ marginTop: "10px" }}>
             <ProfessorCardDetails fontSize="20px">
@@ -178,7 +179,7 @@ function Professor() {
   } else if (!fetchError) {
     return (
       <div>
-        <p style={{ marginTop: "140px" }}>се вчитува...</p>
+        <LoadingSpinner style={{ marginTop: "140px" }}/>
         <Outlet />
       </div>
     );

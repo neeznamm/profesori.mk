@@ -41,7 +41,7 @@ function OpinionTree({ professor }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/secure/currentUser`;
+    const url = `http://192.168.0.29:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -67,13 +67,13 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.19:8080/secure/upvoteOpinion/${post.postId}`,
+          `http://192.168.0.29:8080/secure/upvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
           }
         );
-        window.location.reload(false);
+        window.location.reload();
       } else {
         return;
       }
@@ -90,14 +90,14 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.19:8080/secure/downvoteOpinion/${post.postId}`,
+          `http://192.168.0.29:8080/secure/downvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
           }
         );
 
-        window.location.reload(false);
+        window.location.reload();
       } else {
         return;
       }
@@ -130,7 +130,7 @@ function OpinionTree({ professor }) {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.19:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
+        `http://192.168.0.29:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
         {
           method: "post",
           data: {
@@ -140,7 +140,7 @@ function OpinionTree({ professor }) {
         }
       );
       setErrorMessage("");
-      window.location.reload(false);
+      window.location.reload();
     } else {
       setErrorMessage("Полето за содржина не смее да биде празно");
     }
@@ -160,17 +160,17 @@ function OpinionTree({ professor }) {
             <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
               {child.content}
             </p>
-            {child.timePosted === child.timeLastEdited ? (
+            {new Date(child.timePosted).setMilliseconds(0) === new Date(child.timeLastEdited).setMilliseconds(0) ? (
               <OpinionCardContentTime>
                 {dateConverter(
                   new Date(child.timePosted).toString().slice(4, -43)
-                )}
+                )} <span style={{fontStyle:"normal",color:"blue"}}>#{child.postId}</span>
               </OpinionCardContentTime>
             ) : (
               <OpinionCardContentTime>
                 {dateConverter(
                   new Date(child.timeLastEdited).toString().slice(4, -43)
-                )}{" "}
+                )}{" "} <span style={{fontStyle:"normal",color:"blue"}}>#{child.postId}</span>{" "}
                 (едитирано од модератор)
               </OpinionCardContentTime>
             )}
@@ -259,11 +259,11 @@ function OpinionTree({ professor }) {
                   <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
                     {opinion.content}
                   </p>
-                  {opinion.timePosted === opinion.timeLastEdited ? (
+                  {new Date(opinion.timePosted).setMilliseconds(0) === new Date(opinion.timeLastEdited).setMilliseconds(0) ? (
                     <OpinionCardContentTime>
                       {dateConverter(
                         new Date(opinion.timePosted).toString().slice(4, -43)
-                      )}
+                      )} <span style={{fontStyle:"normal",color:"blue"}}>#{opinion.postId}</span>
                     </OpinionCardContentTime>
                   ) : (
                     <OpinionCardContentTime>
@@ -271,7 +271,7 @@ function OpinionTree({ professor }) {
                         new Date(opinion.timeLastEdited)
                           .toString()
                           .slice(4, -43)
-                      )}{" "}
+                      )}{" "} <span style={{fontStyle:"normal",color:"blue"}}>#{opinion.postId}</span>{" "}
                       (едитирано од модератор)
                     </OpinionCardContentTime>
                   )}

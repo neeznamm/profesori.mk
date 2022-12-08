@@ -27,6 +27,7 @@ import {
   ModalTextarea,
 } from "../Components/Styled/Modal.style";
 import axios from "../api/axios";
+import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 const Subject = () => {
   let params = useParams();
@@ -45,7 +46,7 @@ const Subject = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/public/subject/${params.subjectId}`;
+    const url = `http://192.168.0.29:8080/public/subject/${params.subjectId}`;
 
     const fetchData = async () => {
       try {
@@ -82,7 +83,7 @@ const Subject = () => {
 
     if (!topicTitle.length < 1 && !topicContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.19:8080/secure/subject/${params.subjectId}/addThread`,
+        `http://192.168.0.29:8080/secure/subject/${params.subjectId}/addThread`,
         {
           method: "post",
           data: {
@@ -93,7 +94,7 @@ const Subject = () => {
         }
       );
       setErrorMessage("");
-      window.location.reload(false);
+      window.location.reload();
     } else {
       setErrorMessage("Полињата за наслов и содржина не смеат да бидат празни");
     }
@@ -126,7 +127,7 @@ const Subject = () => {
         &#187; <a href="#">{subject.subjectName}</a>
       </CurrentPageNav>
       <ProfessorCard>
-        <ProfessorCardName>{subject.subjectName}</ProfessorCardName>
+        <ProfessorCardName>{subject.subjectName} <span style={{opacity:"50%", fontSize:"16px"}}>#{subject.subjectId}</span></ProfessorCardName>
         <ProfessorCardSeparator />
         <div style={{ marginTop: "10px" }}>
           <ProfessorCardDetails fontSize="20px">
@@ -203,7 +204,8 @@ const Subject = () => {
       </Modal>
       <div key={subject.subjectId}>
         {topics.map((topic) => {
-          var numReplies = topic.children.length;
+          var numReplies = 0;
+          topic.children.map((c)=>numReplies += ++c.children.length); // ++c.children.length -> c + decata na c
           return (
             <EntityUl key={topic.postId}>
               <EntityLi bgcolor="cornsilk">
@@ -267,7 +269,7 @@ const Subject = () => {
     </>
   ) : !fetchError ? (
     <div>
-      <p style={{ marginTop: "140px" }}>се вчитува...</p>
+      <LoadingSpinner style={{ marginTop: "140px" }}/>
       <Outlet />
     </div>
   ) : (

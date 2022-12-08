@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import JSOG from "jsog";
 import axios from "../api/axios";
 import Logout from "./Logout";
+import LoadingSpinner from "./Styled/LoadingSpinner.style";
 
 function UserHeader({}) {
   const [user, setUser] = useState(null);
@@ -9,7 +10,7 @@ function UserHeader({}) {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/secure/currentUser`;
+    const url = `http://192.168.0.29:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -33,7 +34,7 @@ function UserHeader({}) {
     </div>
   ) : (
     <div style={{ float: "left", marginTop: 25, marginLeft: 60 }}>
-      се вчитува...
+      <LoadingSpinner/>
     </div>
   );
 }

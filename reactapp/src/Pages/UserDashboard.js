@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+// noinspection JSUnresolvedVariable,ES6ConvertVarToLetConst,JSUnresolvedFunction,SpellCheckingInspection,JSUnusedLocalSymbols
+
 import React, { useEffect, useState, useContext } from "react";
 import {
   OpinionCard,
@@ -22,6 +25,7 @@ import {
   ModalHeader, ModalTextarea,
     ModalInput
 } from "../Components/Styled/Modal.style";
+import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 function UserDashboard() {
   const { auth, setAuth } = useContext(AuthApi);
@@ -39,9 +43,20 @@ function UserDashboard() {
   const [actionType, setActionType] = useState(0);
 
   const [newPostContent, setNewPostContent] = useState("");
-  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newOpinionTargetProfessorId, setNewOpinionTargetProfessorId] = useState("");
+  const [newOpinionTargetProfessor, setNewOpinionTargetProfessor] = useState(null);
+  const [loadedNewProfessor,setLoadedNewProfessor] = useState(false);
+  const [newParentPostId, setNewParentPostId] = useState("-1");
+
+  const [newThreadTitle, setNewThreadTitle] = useState("");
+  const [newParentThreadId,setNewParentThreadId] = useState("-1");
+  const [newTargetSubjectId, setNewTargetSubjectId] = useState("");
+  const [newTargetSubject, setNewTargetSubject] = useState(null);
+  const [loadedNewSubject, setLoadedNewSubject] = useState(null);
 
   const [markResolved, setMarkResolved] = useState(false);
+
+  const [errMsg, setErrMsg] = useState("");
 
   const handleModalCloseClick = () => {
     setReportForModal(null);
@@ -58,16 +73,58 @@ function UserDashboard() {
     if(reportForModal!==null) {
       if (reportForModal.post !== null) {
         setNewPostContent(reportForModal.post.content);
-        if(reportForModal.post.title !== null) setNewPostTitle(reportForModal.post.title);
+        if(reportForModal.post.title !== null) setNewThreadTitle(reportForModal.post.title);
+        if(reportForModal.post.targetProfessor !== undefined) setNewOpinionTargetProfessorId(reportForModal.post.targetProfessor.professorId); //prvicnoto
+        if(reportForModal.post.targetProfessor === undefined) setNewTargetSubjectId(reportForModal.post.targetSubject.subjectId); //prvicnoto
       }
       setReportModalDisplay("block");
       document.body.style.overflowY = "hidden";
     }
   }, [reportForModal]);
 
+  const[loadingProf, setLoadingProf] = useState(false);
+
+  const handleNewTargetProfessorChange = async (e) => {
+    setLoadingProf(true);
+    e.preventDefault();
+    if (newOpinionTargetProfessorId!=="") {
+        try {
+          const response = await axios.get(`http://192.168.0.29:8080/public/professor/${newOpinionTargetProfessorId}`, {withCredentials: true});
+          let cyclicGraph = await response.data;
+          var jsogStructure = JSOG.encode(cyclicGraph);
+          cyclicGraph = JSOG.decode(jsogStructure);
+          setNewOpinionTargetProfessor(cyclicGraph);
+          setLoadedNewProfessor(true);
+          setLoadingProf(false);
+        } catch (error) {
+          setFetchError(true);
+        }
+    }
+  }
+
+  const[loadingSubj, setLoadingSubj] = useState(false);
+
+  const handleNewTargetSubjectChange = async (e) => {
+    e.preventDefault();
+    setLoadingSubj(true);
+    if (newTargetSubjectId!=="") {
+      try {
+        const response = await axios.get(`http://192.168.0.29:8080/public/subject/${newTargetSubjectId}`, {withCredentials: true});
+        let cyclicGraph = await response.data;
+        var jsogStructure = JSOG.encode(cyclicGraph);
+        cyclicGraph = JSOG.decode(jsogStructure);
+        setNewTargetSubject(cyclicGraph);
+        setLoadedNewSubject(true);
+        setLoadingSubj(false);
+      } catch (error) {
+        setFetchError(true);
+      }
+    }
+  }
+
   useEffect(() => {
-    const url1 = `http://192.168.0.19:8080/secure/currentUser`;
-    const url2 = `http://192.168.0.19:8080/secure/getAllPostReports`;
+    const url1 = `http://192.168.0.29:8080/secure/currentUser`;
+    const url2 = `http://192.168.0.29:8080/secure/getAllPostReports`;
 
     const fetchUser = async () => {
       try {
@@ -104,7 +161,7 @@ function UserDashboard() {
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
-  //     if (user === null) window.location.reload(false); <---- :-)
+  //     if (user === null) window.location.reload(); <---- :-)
   //   }, 3000);
   //   return () => clearTimeout(timer);
   // }, []);
@@ -118,36 +175,98 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        await axios(`http://192.168.0.19:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+        await axios(`http://192.168.0.29:8080/secure/updateOpinion/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
                 newContent: newPostContent,
                 newTargetProfessorId: reportForModal.post.targetProfessor.professorId,
+                newParentPostId: reportForModal.post.parent !== null ? reportForModal.post.parent.postId : "-1"
               },
               withCredentials: true,
             })
-        window.location.reload(false);
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        await axios(`http://192.168.0.19:8080/secure/updateThread/${reportForModal.post.postId}`,
+        await axios(`http://192.168.0.29:8080/secure/updateThread/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
-                newTitle: newPostTitle,
+                newTitle: newThreadTitle,
                 newContent: newPostContent,
-                newTargetSubjectId: reportForModal.post.targetSubject.subjectId
+                newTargetSubjectId: reportForModal.post.targetSubject.subjectId,
+                newParentThreadId: reportForModal.post.parent !== null ? reportForModal.post.parent.postId : "-1"
               },
               withCredentials: true,
             })
-        window.location.reload(false);
+      }
+        await axios(`http://192.168.0.29:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+          method: "get",
+          withCredentials: true
+        })
+    } catch (error) {
+      setFetchError(true);
+    }
+    window.location.reload();
+  }
+
+  const handleRelocate = async (e) => {
+    e.preventDefault();
+    try {
+      if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
+        var response = await axios(`http://192.168.0.29:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+            {
+              method: "put",
+              data: {
+                newContent: reportForModal.post.content,
+                newTargetProfessorId: newOpinionTargetProfessorId,
+                newParentPostId: newParentPostId==="Постави како самостојно мислење" ? "-1" : newParentPostId //:)
+              },
+              withCredentials: true,
+            })
+      } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
+        var response = await axios(`http://192.168.0.29:8080/secure/updateThread/${reportForModal.post.postId}`,
+            {
+              method: "put",
+              data: {
+                newTitle: newThreadTitle,
+                newContent: reportForModal.post.content,
+                newTargetSubjectId: newTargetSubjectId,
+                newParentThreadId: newParentThreadId==="Постави како самостојно мислење (нова тема)" ? "-1" : newParentThreadId //:)
+              },
+              withCredentials: true,
+            })
+      }
+      await axios(`http://192.168.0.29:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+        method: "get",
+        withCredentials: true
+      })
+    } catch (error) {
+      setFetchError(true);
+    }
+    setErrMsg(response.data);
+    if (response.data==="") window.location.reload();
+  }
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    try {
+      if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
+        await axios(`http://192.168.0.29:8080/secure/deleteOpinion/${reportForModal.post.postId}`,
+            {
+              method: "delete",
+              withCredentials: true,
+            })
+        window.location.reload();
+      } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
+        await axios(`http://192.168.0.29:8080/secure/deleteThread/${reportForModal.post.postId}`,
+            {
+              method: "delete",
+              withCredentials: true,
+            })
       }
     } catch (error) {
       setFetchError(true);
     }
-  }
-
-  const handleDelete = (e) => {
-    e.preventDefault();
+    window.location.reload();
   }
 
   const handleMarkResolved = () => {
@@ -180,7 +299,7 @@ function UserDashboard() {
           <h3 style={{ marginBottom: "10px" }}>Пријави за мислења:</h3>
       ) : (
           <h3>Нема пријавени мислења</h3>
-      ) : loadedUser && user.userRole==='MODERATOR' ? "се вчитува..." : ""}
+      ) : loadedUser && user.userRole==='MODERATOR' ? <LoadingSpinner/> : ""}
       <EntityUl style={{marginTop:"25px"}}>
       {loadedPostReports && postReports.map((postReport) => {
         return <EntityLi bgcolor="cornsilk" key={postReport.postReportId} style={{padding:"15px"}}>
@@ -224,7 +343,7 @@ function UserDashboard() {
                 <OpinionCardContentTime>
                   {dateConverter(
                     new Date(post.timePosted).toString().slice(4, -43)
-                  )}
+                  )} <span style={{fontStyle:"normal",color:"blue"}}>#{post.postId}</span>
                 </OpinionCardContentTime>
               </OpinionCardContent>
             </OpinionCard>
@@ -286,7 +405,7 @@ function UserDashboard() {
                         <OpinionCardContentTime>
                           {dateConverter(
                               new Date(reportForModal.post.timePosted).toString().slice(4, -43)
-                          )}
+                          )} <span style={{fontStyle:"normal",color:"blue"}}>#{reportForModal.post.postId}</span>
                         </OpinionCardContentTime>
                       </OpinionCardContent>
                     </OpinionCard>
@@ -352,11 +471,12 @@ function UserDashboard() {
               {reportForModal.post !== null ?
                   actionType === 0 ?
               (<form onSubmit={e => handleEdit(e)}>
-                {reportForModal.post.title !== null && <label>
+                {reportForModal.post.title !== null &&
+                    <label>
                   <b>Нов наслов на тема:</b>
                   <ModalInput
-                      value={newPostTitle}
-                      onChange={e => setNewPostTitle(e.target.value)}
+                      value={newThreadTitle}
+                      onChange={e => setNewThreadTitle(e.target.value)}
                       id="title"
                       spellCheck={false}
                       style={{marginTop:"10px"}}
@@ -378,7 +498,6 @@ function UserDashboard() {
                 <label>
                   <input
                       type="checkbox"
-                      checked={markResolved}
                       onChange={handleMarkResolved}
                   />
                   <span style={{marginLeft:"10px", fontWeight:"bold"}}>Означи како разрешено</span>
@@ -402,8 +521,90 @@ function UserDashboard() {
                             <ModalFooter type="submit">ПОТВРДИ</ModalFooter>
                           </form>)
                           :
-                          ("123")
-                          : null
+                          (reportForModal.post.targetProfessor !== undefined ?
+                              (<form onSubmit={e => handleRelocate(e)}>
+                                <p style={{color:"black"}}>Внеси <span style={{fontWeight:"bold"}}>ID</span> на секцијата за дискусија (за <span style={{fontWeight:"bold"}}>професор</span>)
+                                    во која треба да биде преместено мислењето:</p>
+                                    <div style={{marginTop:"15px"}}>
+                                      <label>
+                                        <ModalInput
+                                            value={newOpinionTargetProfessorId}
+                                            onChange={e => {e.preventDefault();setNewOpinionTargetProfessorId(e.target.value)}}
+                                            id="newOpinionTargetProfessorId"
+                                            spellCheck={false}
+                                            style={{marginTop:"10px", marginBottom:"10px", width:"90px"}}
+                                        />
+                                        <button onClick={async (e) => {await handleNewTargetProfessorChange(e);}} style={{marginBottom:"10px", padding:"5px", fontFamily: "Roboto Mono, monospace"}}>Зачувај</button>
+                                        {newOpinionTargetProfessor!==null && !loadingProf ? <p style={{color:"black", marginBottom:"20px", opacity:"50%"}}>Мислењето ќе се премести во секцијата за професорот со <span style={{fontWeight:"bold"}}>ID=
+                                          {newOpinionTargetProfessor.professorId}</span> (<span style={{fontWeight:"bold"}}>{newOpinionTargetProfessor.professorName}</span>)</p> : loadingProf ? <LoadingSpinner style={{marginBottom:"15px", marginTop:"15px"}}/> : null}
+                                        {newOpinionTargetProfessor && <p style={{color:"black", marginBottom:"10px"}}>Постави како дете на мислење со ID:</p>}
+                                        {newOpinionTargetProfessor &&
+                                        <select value={newParentPostId} onChange={e => setNewParentPostId(e.target.value)} style={{width:"280px", display:"block", padding:"5px",marginBottom:"5px", fontFamily: "Roboto Mono, monospace"}}>
+                                          <option value="-1">Постави како самостојно мислење</option>
+                                          {newOpinionTargetProfessor.relatedOpinions.filter((opinion)=>opinion.postId!==reportForModal.post.postId).map((opinion) => {
+                                            return <option key={opinion.postId} value={opinion.postId}>{opinion.postId}</option>})
+                                          }
+                                        </select>}
+                                        <br/>
+                                        <input
+                                            type="checkbox"
+                                            defaultChecked={reportForModal.resolved}
+                                            onChange={handleMarkResolved}
+                                        />
+                                        <span style={{marginLeft:"10px", fontWeight:"bold"}}>Означи како разрешено</span>
+                                      </label>
+                                    </div>
+                                {errMsg!=="" && <p style={{color:"red", display:"flex", justifyContent:"space-around"}}>{errMsg}</p>}
+                                    <ModalFooter type="submit">ПОТВРДИ</ModalFooter>
+                                  </form>) :
+                              //THREAD CASE
+                              (<form onSubmit={e => handleRelocate(e)}>
+                                <p style={{color:"black"}}>Внеси <span style={{fontWeight:"bold"}}>ID</span> на секцијата за дискусија (за <span style={{fontWeight:"bold"}}>предмет</span>)
+                                  во која треба да биде преместено мислењето:</p>
+                                <div style={{marginTop:"15px"}}>
+                                  <label>
+                                    <ModalInput
+                                        value={newTargetSubjectId}
+                                        onChange={e => {e.preventDefault();setNewTargetSubjectId(e.target.value)}}
+                                        id="newTargetSubjectId"
+                                        spellCheck={false}
+                                        style={{marginTop:"10px", marginBottom:"10px", width:"90px"}}
+                                    />
+                                    <button onClick={async (e) => {await handleNewTargetSubjectChange(e);}} style={{marginBottom:"10px", padding:"5px", fontFamily: "Roboto Mono, monospace"}}>Зачувај</button>
+                                    {newTargetSubject!==null && !loadingSubj ? <p style={{color:"black", marginBottom:"20px", opacity:"50%"}}>Мислењето ќе се премести во секцијата за предметот со <span style={{fontWeight:"bold"}}>ID=
+                                      {newTargetSubject.subjectId}</span> (<span style={{fontWeight:"bold"}}>{newTargetSubject.subjectName}</span>)</p> : loadingSubj ? <LoadingSpinner style={{marginBottom:"15px", marginTop:"15px"}}/> : null}
+                                    {newTargetSubject && <p style={{color:"black", marginBottom:"10px"}}>Постави како дете на мислење со ID:</p>}
+                                    {newTargetSubject &&
+                                        <select value={newParentThreadId} onChange={e => setNewParentThreadId(e.target.value)} style={{width:"370px", display:"block", padding:"5px",marginBottom:"5px", fontFamily: "Roboto Mono, monospace"}}>
+                                          <option value="-1">Постави како самостојно мислење (нова тема)</option>
+                                          {newTargetSubject.threads.filter((thread)=>thread.postId!==reportForModal.post.postId).map((thread) => {
+                                            return <option key={thread.postId} value={thread.postId}>{thread.postId}</option>})
+                                          }
+                                        </select>}
+                                    {newParentThreadId==="-1" && loadedNewSubject &&
+                                        <>
+                                        <p style={{marginTop:"10px"}}>Наслов на нова тема:</p>
+                                      <ModalInput
+                                        value={newThreadTitle}
+                                        onChange={e => setNewThreadTitle(e.target.value)}
+                                        id="titleChangeRelocate"
+                                        spellCheck={false}
+                                        style={{marginTop:"10px"}}
+                                    />
+                                    </>}
+                                    <br/>
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={reportForModal.resolved}
+                                        onChange={handleMarkResolved}
+                                    />
+                                    <span style={{marginLeft:"10px", fontWeight:"bold"}}>Означи како разрешено</span>
+                                  </label>
+                                </div>
+                                {errMsg!=="" && <p style={{color:"red", display:"flex", justifyContent:"space-around"}}>{errMsg}</p>}
+                                <ModalFooter type="submit">ПОТВРДИ</ModalFooter>
+                              </form>))
+                  : null
               }
                 </ModalBody>
             </ModalContent>
@@ -411,7 +612,7 @@ function UserDashboard() {
       )}
     </>
   ) : (
-    <>се вчитува...</>
+      <LoadingSpinner/>
   );
 }
 

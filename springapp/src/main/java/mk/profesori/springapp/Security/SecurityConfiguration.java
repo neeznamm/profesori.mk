@@ -36,7 +36,7 @@ public class SecurityConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://192.168.0.19:3000", "http://192.168.0.39:3000")
+                registry.addMapping("/**").allowedOrigins("http://192.168.0.29:3000", "http://192.168.0.28:3000")
                         .allowCredentials(true);
             }
         };

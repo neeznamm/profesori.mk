@@ -13,6 +13,7 @@ import {
   EntityParam,
 } from "../Components/Styled/EntityList.style";
 import { CurrentPageNav } from "../Components/Styled/Main.style";
+import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 const University = () => {
   let params = useParams();
@@ -21,7 +22,7 @@ const University = () => {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.0.19:8080/public/faculties?universityId=${params.universityId}`;
+    const url = `http://192.168.0.29:8080/public/faculties?universityId=${params.universityId}`;
 
     const fetchData = async () => {
       try {
@@ -104,7 +105,7 @@ const University = () => {
     </>
   ) : !fetchError && !loaded ? (
     <div>
-      <p style={{ marginTop: "140px" }}>се вчитува...</p>
+      <LoadingSpinner style={{ marginTop: "140px" }}/>
       <Outlet />
     </div>
   ) : (

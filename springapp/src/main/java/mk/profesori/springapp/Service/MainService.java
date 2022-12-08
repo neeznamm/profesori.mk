@@ -140,8 +140,9 @@ public class MainService {
 
     public void addThread(String title, String content, Long subjectId, CustomUserDetails currentUser) {
         Subject targetSubject = subjectRepository.findBySubjectId(subjectId);
+        String titleToSet = title.equals("") ? null : title;
 
-        _Thread _threadToAdd = new _Thread(title, content, currentUser, null, null, null, targetSubject);
+        _Thread _threadToAdd = new _Thread(titleToSet, content, currentUser, null, null, null, targetSubject);
         _threadRepository.save(_threadToAdd);
     }
 
@@ -198,22 +199,34 @@ public class MainService {
     public void deleteOpinion(Long postId) {opinionRepository.deleteById(postId);}
     public void delete_Thread(Long postId) {_threadRepository.deleteById(postId);}
 
-    public void updateOpinion(String newContent, Long newTargetProfessorId, Long postId) {
+    public String updateOpinion(String newContent, Long newTargetProfessorId, Long newParentPostId, Long postId) {
         Opinion opinionToUpdate = opinionRepository.findByPostId(postId);
 
         opinionToUpdate.setContent(newContent);
 
         Professor newTargetProfessor = professorRepository.findByProfessorId(newTargetProfessorId);
-        opinionToUpdate.setTargetProfessor(newTargetProfessor); //opcijava da ja dava samo kaj postovi so parentPost==null
+        opinionToUpdate.setTargetProfessor(newTargetProfessor);
+
+        Opinion newParentOpinion = null;
+        if (newParentPostId != -1) {
+            newParentOpinion = opinionRepository.findByPostId(newParentPostId);
+            if (!newParentOpinion.getTargetProfessor().equals(newTargetProfessor))
+                throw new IncompatiblePostId("Мислењето не припаѓа во специфицираната секција за дискусија.");
+            if (opinionToUpdate.getChildren().contains(newParentOpinion))
+                throw new DisallowedOperationException("Мислењето не може да се постави како дете на негово дете (бесконечна рекурзија)");
+        }
+        opinionToUpdate.setParent(newParentOpinion);
+
         for(Post p : opinionToUpdate.getChildren()) {
             Opinion o = (Opinion) p;
             o.setTargetProfessor(newTargetProfessor);
         }
         opinionToUpdate.setTimeLastEdited(LocalDateTime.now());
         opinionRepository.save(opinionToUpdate);
+        return null;
     }
 
-    public void update_Thread(String newTitle, String newContent, Long newTargetSubjectId, Long newParentThreadId, Long postId) {
+    public String update_Thread(String newTitle, String newContent, Long newTargetSubjectId, Long newParentThreadId, Long postId) {
         _Thread _threadToUpdate = _threadRepository.findByPostId(postId);
 
         _threadToUpdate.setContent(newContent);
@@ -221,21 +234,21 @@ public class MainService {
         Subject newTargetSubject = subjectRepository.findBySubjectId(newTargetSubjectId);
         _threadToUpdate.setTargetSubject(newTargetSubject);
 
-        if(newParentThreadId != null) { //samo ako e specificirano
-            _Thread newParentThread = _threadRepository.findByPostId(newParentThreadId);
-
-            if (_threadToUpdate.getParent() == null || _threadToUpdate.getParent().getPostId().equals(postId)) {
-                _threadToUpdate.setParent(newParentThread);
-            }//samo ako e naslovniot post ili directChild
-            } else if(_threadToUpdate.getParent() != null) {
-            _threadToUpdate.setParent(null);
-            }
+        _Thread newParentThread = null;
+        if(newParentThreadId != -1) {
+            newParentThread = _threadRepository.findByPostId(newParentThreadId);
+            if (!newParentThread.getTargetSubject().equals(newTargetSubject))
+                throw new IncompatiblePostId("Мислењето не припаѓа во специфицираната секција за дискусија.");
+            if (_threadToUpdate.getChildren().contains(newParentThread))
+                throw new DisallowedOperationException("Мислењето не може да се постави како дете на негово дете (бесконечна рекурзија)");
+        }
+        _threadToUpdate.setParent(newParentThread);
 
             if(_threadToUpdate.getParent() == null) {
              _threadToUpdate.setTitle(newTitle);
             } else {
-             _threadToUpdate.setTitle(null);
-             }
+                _threadToUpdate.setTitle(null);
+            }
 
          for(Post p : _threadToUpdate.getChildren()) {
                 _Thread t = (_Thread) p;
@@ -243,6 +256,7 @@ public class MainService {
             }
          _threadToUpdate.setTimeLastEdited(LocalDateTime.now());
           _threadRepository.save(_threadToUpdate);
+          return null;
     }
 
     public void lockUser(Long userId) {
@@ -279,6 +293,7 @@ public class MainService {
         PostReport report = postReportRepository.findByPostReportId(postReportId);
         if (action.equals("resolve")) report.setResolved(true);
         else if (action.equals("open")) report.setResolved(false);
+        postReportRepository.save(report);
      }
 
     public List<PostReport> getAllPostReports() {
