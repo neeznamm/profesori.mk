@@ -1,8 +1,0 @@
-(0) post-tables-restart
-(1) custom_user_details.sql
-(2) post-opinions.sql
-(3) post-threads.sql
-(4) post-thread-replies-nullsubjectid.sql
-(5) update-thread-replies-setsubjectid.sql
-(6) post-opinion-replies-nullprofessor.sql
-(7) update-opinion-replies-setprofessorid.sql

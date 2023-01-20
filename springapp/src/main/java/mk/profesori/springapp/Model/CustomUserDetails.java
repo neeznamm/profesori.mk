@@ -1,6 +1,7 @@
 package mk.profesori.springapp.Model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.voodoodyne.jackson.jsog.JSOGGenerator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,21 +31,31 @@ public class CustomUserDetails implements UserDetails {
     private Long id;
     private String fullName;
     private String username;
+    @JsonIgnore
     private String email;
-    private String password; // TODO
+    @JsonIgnore
+    private String password;
+    /*  UseCases
+        го уредува својот кориснички профил
+        го верификува својот кориснички профил todo...
+    */
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private Boolean locked = false;
     private Boolean enabled = false;
-    @OneToMany(mappedBy = "customUserDetails", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Transient
+    @OneToMany(mappedBy = "customUserDetails", orphanRemoval = true)
     private Set<ConfirmationToken> confirmationTokens = new HashSet<>();
-    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Transient
+    @OneToMany(mappedBy = "author", orphanRemoval = true)
     private Set<Post> authoredPosts = new HashSet<>();
     private Integer karma = 0;
 
+    @Transient
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostVote> votes = new HashSet<>();
 
+    @Transient
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
     private Set<PostReport> reportsSubmitted = new HashSet<>();
     @PreRemove
@@ -98,32 +109,8 @@ public class CustomUserDetails implements UserDetails {
         return enabled;
     }
 
-    public Set<Post> getAuthoredPosts() {
-        return this.authoredPosts;
-    }
-
-    public Integer getKarma() {
-        return this.karma;
-    }
-
-    public void setKarma(Integer karma) {
-        this.karma = karma;
-    }
-
     @Override
     public String toString() {
         return this.id.toString();
-    }
-
-    public void setLocked(Boolean locked) {
-        this.locked = locked;
-    }
-
-    public Set<PostVote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<PostVote> votes) {
-        this.votes = votes;
     }
 }

@@ -17,29 +17,36 @@ import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 const University = () => {
   let params = useParams();
-  const [loaded, setLoaded] = useState(false);
+
   const [faculties, setFaculties] = useState(null);
+  const [loadedFaculties, setLoadedFaculties] = useState(false);
+
+  const [counts, setCounts] = useState(null);
+  const [loadedCounts, setLoadedCounts] = useState(false);
+
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/public/faculties?universityId=${params.universityId}`;
+        Promise.all([fetch(`http://192.168.1.254:8080/public/faculties?universityId=${params.universityId}`),
+        fetch(`http://192.168.1.254:8080/public/university/${params.universityId}/sectionAndPostCount`)])
+            .then(([resFaculties, counts]) => Promise.all([resFaculties.json(), counts.json()]))
+            .then(([dataFaculties, dataCounts]) => {
+                let cyclicGraph1 = dataFaculties;
+                let jsogStructure1 = JSOG.encode(cyclicGraph1);
+                cyclicGraph1 = JSOG.decode(jsogStructure1);
+                setFaculties(cyclicGraph1);
+                setLoadedFaculties(true);
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(url);
-        var cyclicGraph = await response.json();
-        var jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setFaculties(cyclicGraph);
-        setLoaded(true);
-      } catch (error) {
-        setFetchError(true);
-      }
-    };
-    fetchData();
-  }, [params.universityId]);
+                let cyclicGraph2 = dataCounts;
+                let jsogStructure2 = JSOG.encode(cyclicGraph2);
+                cyclicGraph2 = JSOG.decode(jsogStructure2);
+                setCounts(cyclicGraph2);
+                setLoadedCounts(true);
+            })
 
-  return loaded && !fetchError && faculties.length !== 0 ? (
+  }, []);
+
+  return loadedFaculties && !fetchError && faculties.length !== 0 ? (
     <>
       <CurrentPageNav>
         &#187; <a href="#">{faculties[0].university.universityName}</a>
@@ -54,20 +61,10 @@ const University = () => {
         </ProfessorCardDetails>
       </ProfessorCard>
       <div key={params.universityId}>
-        {faculties.map((faculty) => {
-          let totalPosts = 0;
-          let totalSections = 0;
-          faculty.professors.map((professor) => {
-            totalPosts += professor.relatedOpinions.length;
-            totalSections++;
-          });
-          faculty.studyProgrammes.map((studyProgramme) => {
-            studyProgramme.subjects.map((subject) => {
-              totalPosts += subject.threads.length;
-              totalSections++;
-            });
-          });
-
+        {faculties.map((faculty, idx) => {
+          let totalPosts = parseInt(counts[idx].split(",")[2]);
+          let totalSections = parseInt(counts[idx].split(",")[1]);
+          console.log(counts)
           return (
             <EntityUl key={faculty.facultyId}>
               <EntityLi bgcolor="cornsilk">
@@ -103,7 +100,7 @@ const University = () => {
         })}
       </div>
     </>
-  ) : !fetchError && !loaded ? (
+  ) : !fetchError && !loadedFaculties ? (
     <div>
       <LoadingSpinner style={{ marginTop: "140px" }}/>
       <Outlet />

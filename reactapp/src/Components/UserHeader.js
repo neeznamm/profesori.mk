@@ -10,7 +10,7 @@ function UserHeader({}) {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/secure/currentUser`;
+    const url = `http://192.168.1.254:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -29,11 +29,11 @@ function UserHeader({}) {
   }, []);
 
   return loadedUser ? (
-    <div style={{ float: "left", marginTop: 20, marginLeft: 40 }}>
+    <div style={{ float: "left", marginTop: 20, marginLeft: 10 }}>
       Најавен/а: <a href="/user_dashboard">{user.username}</a> <Logout />{" "}
     </div>
   ) : (
-    <div style={{ float: "left", marginTop: 25, marginLeft: 60 }}>
+    <div style={{ float: "left", marginTop: 25, marginLeft: 10 }}>
       <LoadingSpinner/>
     </div>
   );

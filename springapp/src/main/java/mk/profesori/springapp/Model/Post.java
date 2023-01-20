@@ -2,6 +2,7 @@ package mk.profesori.springapp.Model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.voodoodyne.jackson.jsog.JSOGGenerator;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "post")
+@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "post_type", discriminatorType = DiscriminatorType.STRING)
 @JsonIdentityInfo(generator = JSOGGenerator.class)
@@ -43,11 +45,12 @@ public class Post {
     @JoinColumn(name = "parent_post_id")
     private Post parent;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<PostVote> votes = new HashSet<>();
 
-    @OneToMany(mappedBy = "post", cascade={CascadeType.PERSIST})
+    @OneToMany(mappedBy = "post", cascade={CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private Set<PostReport> reports = new HashSet<>();
+
     @PreRemove
     public void preRemove() {
         reports.forEach(report -> {
@@ -55,82 +58,8 @@ public class Post {
             report.setResolved(true);
         });
     }
-
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Post> children = new ArrayList<>();
-
-    // getters and setters
-    public Set<PostVote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<PostVote> votes) {
-        this.votes = votes;
-    }
-    public Long getPostId() {
-        return postId;
-    }
-
-    public void setPostId(Long postId) {
-        this.postId = postId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public CustomUserDetails getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(CustomUserDetails author) {
-        this.author = author;
-    }
-
-    public LocalDateTime getTimePosted() {
-        return timePosted;
-    }
-
-    public void setTimePosted(LocalDateTime timePosted) {
-        this.timePosted = timePosted;
-    }
-
-    public LocalDateTime getTimeLastEdited() {
-        return timeLastEdited;
-    }
-
-    public void setTimeLastEdited(LocalDateTime timeLastEdited) {
-        this.timeLastEdited = timeLastEdited;
-    }
-
-    public Post getParent() {
-        return parent;
-    }
-
-    public void setParent(Post parent) {
-        this.parent = parent;
-    }
-
-    public List<Post> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<Post> children) {
-        this.children = children;
-    }
 
     // konstruktor so parent (koga e reply)
     public Post(String title, String content, CustomUserDetails author, LocalDateTime timePosted,

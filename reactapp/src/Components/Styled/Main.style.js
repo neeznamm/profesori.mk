@@ -24,5 +24,6 @@ export const MainTitle = styled.h1`
 
 export const CurrentPageNav = styled.div`
   font-style: italic;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
 `;

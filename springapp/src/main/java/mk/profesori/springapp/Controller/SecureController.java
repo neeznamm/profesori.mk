@@ -2,11 +2,12 @@ package mk.profesori.springapp.Controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import mk.profesori.springapp.Model.CustomUserDetails;
+import mk.profesori.springapp.Model.Post;
 import mk.profesori.springapp.Model.PostReport;
 import mk.profesori.springapp.Model.UserRole;
 import mk.profesori.springapp.Service.CustomUserDetailsService;
-import mk.profesori.springapp.Service.DisallowedOperationException;
-import mk.profesori.springapp.Service.IncompatiblePostId;
+import mk.profesori.springapp.Service.Exception.DisallowedOperationException;
+import mk.profesori.springapp.Service.Exception.IncompatiblePostId;
 import mk.profesori.springapp.Service.MainService;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.security.core.Authentication;
@@ -16,10 +17,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.0.29:3000", "http://192.168.0.28:3000" })
+@CrossOrigin(origins = { "http://192.168.1.254:3000", "http://192.168.0.28:3000" })
 public class SecureController {
 
     private final MainService mainService;
@@ -76,6 +78,15 @@ public class SecureController {
         Authentication authentication = context.getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser) {
             return customUserDetailsService.loadUserByUsername(currentUser.getEmail());
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/currentUser/posts", method = RequestMethod.GET)
+    public Set<Post> getPostsByUser(@CurrentSecurityContext SecurityContext context) {
+        Authentication authentication = context.getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser) {
+            return mainService.getPostsByUser(currentUser.getEmail());
         }
         return null;
     }

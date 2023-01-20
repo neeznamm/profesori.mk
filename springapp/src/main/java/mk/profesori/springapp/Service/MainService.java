@@ -2,12 +2,15 @@ package mk.profesori.springapp.Service;
 
 import mk.profesori.springapp.Model.*;
 import mk.profesori.springapp.Repository.*;
+import mk.profesori.springapp.Service.Exception.DisallowedOperationException;
+import mk.profesori.springapp.Service.Exception.IncompatiblePostId;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MainService {
@@ -23,8 +26,9 @@ public class MainService {
     private final PostVoteRepository postVoteRepository;
     private final UserRepository userRepository;
     private final PostReportRepository postReportRepository;
+    private final PostRepository postRepository;
 
-    public MainService(ProfessorRepository professorRepository, StudyProgrammeRepository studyProgrammeRepository, FacultyRepository facultyRepository, UniversityRepository universityRepository, CityRepository cityRepository, OpinionRepository opinionRepository, _ThreadRepository _threadRepository, SubjectRepository subjectRepository, PostVoteRepository postVoteRepository, UserRepository userRepository, PostReportRepository postReportRepository) {
+    public MainService(ProfessorRepository professorRepository, StudyProgrammeRepository studyProgrammeRepository, FacultyRepository facultyRepository, UniversityRepository universityRepository, CityRepository cityRepository, OpinionRepository opinionRepository, _ThreadRepository _threadRepository, SubjectRepository subjectRepository, PostVoteRepository postVoteRepository, UserRepository userRepository, PostReportRepository postReportRepository, PostRepository postRepository) {
         this.professorRepository = professorRepository;
         this.studyProgrammeRepository = studyProgrammeRepository;
         this.facultyRepository = facultyRepository;
@@ -36,6 +40,7 @@ public class MainService {
         this.postVoteRepository = postVoteRepository;
         this.userRepository = userRepository;
         this.postReportRepository = postReportRepository;
+        this.postRepository = postRepository;
     }
 
     public List<Professor> getAllProfessors() {
@@ -57,6 +62,10 @@ public class MainService {
 
     public List<Professor> getProfessorsByNameContains(String contained) {
         return new ArrayList<>(professorRepository.findByProfessorNameContainingIgnoreCase(contained));
+    }
+
+    public List<Subject> getSubjectsByNameContains(String contained) {
+        return new ArrayList<>(subjectRepository.findBySubjectNameContainingIgnoreCase(contained));
     }
 
     public List<StudyProgramme> getAllStudyProgrammes() {
@@ -199,7 +208,7 @@ public class MainService {
     public void deleteOpinion(Long postId) {opinionRepository.deleteById(postId);}
     public void delete_Thread(Long postId) {_threadRepository.deleteById(postId);}
 
-    public String updateOpinion(String newContent, Long newTargetProfessorId, Long newParentPostId, Long postId) {
+    public void updateOpinion(String newContent, Long newTargetProfessorId, Long newParentPostId, Long postId) {
         Opinion opinionToUpdate = opinionRepository.findByPostId(postId);
 
         opinionToUpdate.setContent(newContent);
@@ -217,16 +226,24 @@ public class MainService {
         }
         opinionToUpdate.setParent(newParentOpinion);
 
-        for(Post p : opinionToUpdate.getChildren()) {
-            Opinion o = (Opinion) p;
-            o.setTargetProfessor(newTargetProfessor);
-        }
+        propagateNewTargetProfessorToChildren(opinionToUpdate, newTargetProfessor);
+
         opinionToUpdate.setTimeLastEdited(LocalDateTime.now());
         opinionRepository.save(opinionToUpdate);
-        return null;
     }
 
-    public String update_Thread(String newTitle, String newContent, Long newTargetSubjectId, Long newParentThreadId, Long postId) {
+    public void propagateNewTargetProfessorToChildren(Opinion opinionToUpdate, Professor newTargetProfessor) {
+        for(Post p : opinionToUpdate.getChildren()) {
+            // direct children
+            Opinion o = (Opinion) p;
+            o.setTargetProfessor(newTargetProfessor);
+            // ancestors
+            if(o.getChildren().isEmpty()) return;
+            propagateNewTargetProfessorToChildren(o, newTargetProfessor);
+        }
+    }
+
+    public void update_Thread(String newTitle, String newContent, Long newTargetSubjectId, Long newParentThreadId, Long postId) {
         _Thread _threadToUpdate = _threadRepository.findByPostId(postId);
 
         _threadToUpdate.setContent(newContent);
@@ -250,13 +267,21 @@ public class MainService {
                 _threadToUpdate.setTitle(null);
             }
 
-         for(Post p : _threadToUpdate.getChildren()) {
-                _Thread t = (_Thread) p;
-                t.setTargetSubject(newTargetSubject);
-            }
+         propagateNewTargetSubjectToChildren(_threadToUpdate, newTargetSubject);
+
          _threadToUpdate.setTimeLastEdited(LocalDateTime.now());
           _threadRepository.save(_threadToUpdate);
-          return null;
+    }
+
+    public void propagateNewTargetSubjectToChildren(_Thread _threadToUpdate, Subject newTargetSubject) {
+        for(Post p : _threadToUpdate.getChildren()) {
+            // direct children
+            _Thread t = (_Thread) p;
+            t.setTargetSubject(newTargetSubject);
+            // ancestors
+            if (t.getChildren().isEmpty()) return;
+            propagateNewTargetSubjectToChildren(t, newTargetSubject);
+        }
     }
 
     public void lockUser(Long userId) {
@@ -304,5 +329,50 @@ public class MainService {
         Post targetPost = _threadRepository.findByPostId(postId);
         PostReport reportToAdd = new PostReport(currentUser, targetPost, description);
         postReportRepository.save(reportToAdd);
+    }
+
+    public List<Opinion> getRelatedOpinions(Long professorId) {
+        Professor p = professorRepository.findByProfessorId(professorId);
+        return opinionRepository.findByTargetProfessor(p);
+    }
+
+    public List<Opinion> getLatest10Opinions() {
+        return opinionRepository.findTop10ByOrderByTimePosted();
+    }
+    public List<_Thread> getLatest10Threads() {
+        return _threadRepository.findTop10ByOrderByTimePosted();
+    }
+
+    public List<String> getUniversitySectionAndPostCount() {
+        return universityRepository.findSectionAndPostCount();
+    }
+
+    public List<Subject> getSubjectsByStudyProgramme(Long studyProgrammeId) {
+        StudyProgramme sp = studyProgrammeRepository.findByStudyProgrammeId(studyProgrammeId);
+        return subjectRepository.findByStudyProgramme(sp);
+    }
+
+    public List<String> getOpinionCountForEachProfessorInFaculty(Long id) {
+        return facultyRepository.getOpinionCountForEachProfessorInFaculty(id);
+    }
+
+    public List<_Thread> getThreadsBySubject(Long id) {
+        Subject s = subjectRepository.findBySubjectId(id);
+        return _threadRepository.findByTargetSubject(s);
+    }
+
+    public List<String> getThreadCountForEachSubjectInStudyProgramme(Long id) {
+        return studyProgrammeRepository.getThreadCountForEachSubjectInStudyProgramme(id);
+    }
+
+    public Set<Post> getPostsByUser(String email) {
+        CustomUserDetails u = userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("User with email %s not found", email)));
+        return postRepository.findByAuthor(u);
+    }
+
+    public CustomUserDetails getPublicUserProfile(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("User with id %d not found", id)));
     }
 }

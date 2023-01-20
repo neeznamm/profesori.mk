@@ -31,6 +31,8 @@ function Professor() {
 
   const [professor, setProfessor] = useState(null);
   const [loadedProfessor, setLoadedProfessor] = useState(false);
+  const [relatedOpinions, setRelatedOpinions] = useState(null);
+  const [loadedRelatedOpinions, setLoadedRelatedOpinions] = useState(false);
 
   const [postModalDisplay, setPostModalDisplay] = useState("none");
   const { auth, setAuth } = useContext(AuthApi);
@@ -39,23 +41,24 @@ function Professor() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/public/professor/${params.professorId}`;
+     Promise.all([fetch(`http://192.168.1.254:8080/public/professor/${params.professorId}`),
+     fetch(`http://192.168.1.254:8080/public/professor/${params.professorId}/relatedOpinions`)])
+        .then(([resProfessor, resRelatedOpinions]) => Promise.all([resProfessor.json(), resRelatedOpinions.json()]))
+        .then(([dataProfessor, dataRelatedOpinions]) => {
+          let cyclicGraph1 = dataProfessor;
+          let jsogStructure1 = JSOG.encode(cyclicGraph1);
+          cyclicGraph1 = JSOG.decode(jsogStructure1);
+          setProfessor(cyclicGraph1);
+          setLoadedProfessor(true);
 
-    const fetchProfessor = async () => {
-      try {
-        const response = await fetch(url);
-        var cyclicGraph = await response.json();
-        var jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setProfessor(cyclicGraph);
-        setLoadedProfessor(true);
-      } catch (error) {
-        setFetchError(true);
-      }
-    };
+          let cyclicGraph2 = dataRelatedOpinions;
+          let jsogStructure2 = JSOG.encode(cyclicGraph2);
+          cyclicGraph2 = JSOG.decode(jsogStructure2);
+          setRelatedOpinions(cyclicGraph2);
+          setLoadedRelatedOpinions(true);
+        })
 
-    fetchProfessor();
-  }, [params.professorId]);
+  }, []);
 
   const handleAddOpinionButtonClick = () => {
     if (auth) {
@@ -76,7 +79,7 @@ function Professor() {
 
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.29:8080/secure/professor/${params.professorId}/addOpinion`,
+        `http://192.168.1.254:8080/secure/professor/${params.professorId}/addOpinion`,
         {
           method: "post",
           data: {
@@ -128,8 +131,8 @@ function Professor() {
               float: "left",
             }}
           >
-            {professor.relatedOpinions.length}{" "}
-            {professor.relatedOpinions.length !== 1 ? "мислења" : "мислење"}
+            {relatedOpinions.length}{" "}
+            {relatedOpinions.length !== 1 ? "мислења" : "мислење"}
           </h3>
           {auth && (
             <AddOpinionButton onClick={handleAddOpinionButtonClick}>
@@ -171,7 +174,7 @@ function Professor() {
         </Modal>
 
         <div className="opinionTree">
-          <OpinionTree professor={professor} />
+          <OpinionTree professor={professor} relatedOpinions={relatedOpinions}/>
         </div>
         <Outlet />
       </div>

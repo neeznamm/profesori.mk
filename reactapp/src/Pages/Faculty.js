@@ -19,20 +19,21 @@ import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 
 const Faculty = () => {
   let params = useParams();
-  const [loadedProfessors, setLoadedProfessors] = useState(false);
-  const [loadedStudyProgrammes, setLoadedStudyProgrammes] = useState(false);
+
   const [professors, setProfessors] = useState(null);
   const [studyProgrammes, setStudyProgrammes] = useState(null);
+  const [professorOpinionCount, setProfessorOpinionCount] = useState(null);
+  const [loadedProfessors, setLoadedProfessors] = useState(false);
+  const [loadedStudyProgrammes, setLoadedStudyProgrammes] = useState(false);
+  const [loadedProfessorOpinionCount, setLoadedProfessorOpinionCount] = useState(false);
+
   const [fetchError, setFetchError] = useState(false);
   const [entityType, setEntityType] = useState(0);
 
   useEffect(() => {
-    const urlProfessors = `http://192.168.0.29:8080/public/professors?facultyId=${params.facultyId}`;
-    const urlStudyProgrammes = `http://192.168.0.29:8080/public/study_programmes?facultyId=${params.facultyId}`;
-
-    const fetchDataProfessors = async () => {
+    const fetchProfessors = async () => {
       try {
-        const response = await fetch(urlProfessors);
+        const response = await fetch(`http://192.168.1.254:8080/public/professors?facultyId=${params.facultyId}`);
         let cyclicGraph = await response.json();
         let jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
@@ -43,9 +44,9 @@ const Faculty = () => {
       }
     };
 
-    const fetchDataStudyProgrammes = async () => {
+    const fetchStudyProgrammes = async () => {
       try {
-        const response2 = await fetch(urlStudyProgrammes);
+        const response2 = await fetch(`http://192.168.1.254:8080/public/study_programmes?facultyId=${params.facultyId}`);
         let cyclicGraph2 = await response2.json();
         let jsogStructure2 = JSOG.encode(cyclicGraph2);
         cyclicGraph2 = JSOG.decode(jsogStructure2);
@@ -56,11 +57,25 @@ const Faculty = () => {
       }
     };
 
-    fetchDataProfessors();
-    fetchDataStudyProgrammes();
+    const fetchProfessorOpinionCount = async () => {
+      try {
+        const response3 = await fetch(`http://192.168.1.254:8080/public/faculty/${params.facultyId}/opinionCountForEachProfessor`);
+        let cyclicGraph3 = await response3.json();
+        let jsogStructure3 = JSOG.encode(cyclicGraph3);
+        cyclicGraph3 = JSOG.decode(jsogStructure3);
+        setProfessorOpinionCount(cyclicGraph3);
+        setLoadedProfessorOpinionCount(true);
+      } catch (error) {
+        setFetchError(true);
+      }
+    }
+
+    fetchProfessors();
+    fetchStudyProgrammes();
+    fetchProfessorOpinionCount();
   }, [params.facultyId]);
 
-  return loadedProfessors && professors.length != 0 ? (
+  return loadedProfessors && professors.length !== 0 ? (
     entityType === 0 ? (
       <>
         <CurrentPageNav>
@@ -105,9 +120,8 @@ const Faculty = () => {
           </EntityTypeSelector>
         </div>
         <div key={params.facultyId}>
-          {professors.map((professor) => {
-            let totalPosts = professor.relatedOpinions.length;
-
+          {professors.map((professor, idx) => {
+            let totalPosts = loadedProfessorOpinionCount ? parseInt(professorOpinionCount[idx].split(",")[1]) : 0;
             return (
               <EntityUl key={professor.professorId}>
                 <EntityLi bgcolor="cornsilk">
@@ -214,7 +228,6 @@ const Faculty = () => {
                 <SubjectsAccordion
                   key={studyProgramme.studyProgrammeId}
                   title={studyProgramme}
-                  content={studyProgramme.subjects}
                 ></SubjectsAccordion>
               );
             })}

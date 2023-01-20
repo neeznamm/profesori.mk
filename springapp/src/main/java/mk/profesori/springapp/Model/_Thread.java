@@ -1,18 +1,17 @@
 package mk.profesori.springapp.Model;
 
-import java.time.LocalDateTime;
-
-import java.util.List;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Data
 @DiscriminatorValue("thread")
 @NoArgsConstructor
 public class _Thread extends Post {
@@ -33,14 +32,6 @@ public class _Thread extends Post {
     public _Thread(String title, String content, CustomUserDetails author, LocalDateTime timePosted,
             LocalDateTime timeLastEdited, List<Post> children, Subject targetSubject) {
         super(title, content, author, timePosted, timeLastEdited, children);
-        this.targetSubject = targetSubject;
-    }
-
-    public Subject getTargetSubject() {
-        return targetSubject;
-    }
-
-    public void setTargetSubject(Subject targetSubject) {
         this.targetSubject = targetSubject;
     }
 }

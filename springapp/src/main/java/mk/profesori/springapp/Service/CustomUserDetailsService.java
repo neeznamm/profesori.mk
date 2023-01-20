@@ -1,8 +1,9 @@
 package mk.profesori.springapp.Service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+import lombok.AllArgsConstructor;
+import mk.profesori.springapp.Model.ConfirmationToken;
+import mk.profesori.springapp.Model.CustomUserDetails;
+import mk.profesori.springapp.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,10 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
-import mk.profesori.springapp.Model.ConfirmationToken;
-import mk.profesori.springapp.Model.CustomUserDetails;
-import mk.profesori.springapp.Repository.UserRepository;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor

@@ -42,14 +42,20 @@ const Topic = () => {
 
   const [postModalDisplay, setPostModalDisplay] = useState("none");
   const [postContent, setPostContent] = useState("");
+
   const [replyModalDisplay, setReplyModalDisplay] = useState("none");
   const [replyContent, setReplyContent] = useState("");
-  const [postForModal, setPostForModal] = useState(null);
+  const [postForReplyModal, setPostForReplyModal] = useState(null);
+
+  const [reportModalDisplay, setReportModalDisplay] = useState("none");
+  const [reportContent, setReportContent] = useState("");
+  const [postForReportModal, setPostForReportModal] = useState(null);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url1 = `http://192.168.0.29:8080/public/thread/${params.topicId}`;
-    const url2 = `http://192.168.0.29:8080/secure/currentUser`;
+    const url1 = `http://192.168.1.254:8080/public/thread/${params.topicId}`;
+    const url2 = `http://192.168.1.254:8080/secure/currentUser`;
 
     const fetchTopic = async () => {
       try {
@@ -78,12 +84,22 @@ const Topic = () => {
     };
 
     fetchTopic().then(fetchUser);
-  }, []);
+  }, [loadedThread]);
 
   const handleReply = (post) => {
     if (auth) {
       setReplyModalDisplay("block");
-      setPostForModal(post);
+      setPostForReplyModal(post);
+      document.body.style.overflowY = "hidden";
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleReport = (post) => {
+    if (auth) {
+      setReportModalDisplay("block");
+      setPostForReportModal(post);
       document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
@@ -94,12 +110,17 @@ const Topic = () => {
     setReplyContent(e.target.value);
   };
 
+  const handleReportContentChange = (e) => {
+    e.preventDefault();
+    setReportContent(e.target.value);
+  };
+
   const handleReplySubmit = async (e, postId) => {
     e.preventDefault();
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.29:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
+        `http://192.168.1.254:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
         {
           method: "post",
           data: {
@@ -107,6 +128,27 @@ const Topic = () => {
           },
           withCredentials: true,
         }
+      );
+      setErrorMessage("");
+      window.location.reload();
+    } else {
+      setErrorMessage("Полето за содржина не смее да биде празно");
+    }
+  };
+
+  const handleReportSubmit = async (e, postId) => {
+    e.preventDefault();
+
+    if (!reportContent.length < 1) {
+      const response = await axios(
+          `http://192.168.1.254:8080/secure/reportThread/${postId}`,
+          {
+            method: "post",
+            data: {
+              description: reportContent,
+            },
+            withCredentials: true,
+          }
       );
       setErrorMessage("");
       window.location.reload();
@@ -128,7 +170,7 @@ const Topic = () => {
     e.preventDefault();
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.29:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
+        `http://192.168.1.254:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
         {
           method: "post",
           data: {
@@ -146,6 +188,7 @@ const Topic = () => {
   const handleModalCloseClick = () => {
     setPostModalDisplay("none");
     setReplyModalDisplay("none");
+    setReportModalDisplay("none");
     document.body.style.overflowY = "auto";
   };
   const handleContentChange = (e) => {
@@ -160,7 +203,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.29:8080/secure/upvoteThread/${post.postId}`,
+          `http://192.168.1.254:8080/secure/upvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -183,7 +226,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.29:8080/secure/downvoteThread/${post.postId}`,
+          `http://192.168.1.254:8080/secure/downvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -279,6 +322,13 @@ const Topic = () => {
                 right={90 + "px"}
                 color="darkgrey"
                 onClick={() => handleReply(child)}
+              />
+
+              <StyledFontAwesomeIcon
+                  icon={solid("flag")}
+                  right={130 + "px"}
+                  color="darkgrey"
+                  onClick={() => handleReport(child)}
               />
             </div>
           </OpinionReplyCardContent>
@@ -391,6 +441,12 @@ const Topic = () => {
                   : "none",
             }}
           >
+            <StyledFontAwesomeIcon
+                icon={solid("flag")}
+                right={90 + "px"}
+                color="darkgrey"
+                onClick={() => handleReport(thread)}
+            />
             <StyledFontAwesomeIcon
               icon={solid("thumbs-up")}
               right={50 + "px"}
@@ -516,6 +572,13 @@ const Topic = () => {
                   color="darkgrey"
                   onClick={() => handleReply(directChild)}
                 />
+
+                <StyledFontAwesomeIcon
+                    icon={solid("flag")}
+                    right={130 + "px"}
+                    color="darkgrey"
+                    onClick={() => handleReport(directChild)}
+                />
               </div>
             </OpinionCardContent>
             {directChild.children.map((child) =>
@@ -524,16 +587,16 @@ const Topic = () => {
           </OpinionCard>
         );
       })}
-      {postForModal && (
+      {postForReplyModal && (
         <Modal display={replyModalDisplay}>
           <ModalContent>
             <ModalHeader>
               <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
               <h3 style={{ marginTop: "5px" }}>
-                Реплика на {postForModal.author.username}
+                Реплика на {postForReplyModal.author.username}
               </h3>
             </ModalHeader>
-            <form onSubmit={(e) => handleReplySubmit(e, postForModal.postId)}>
+            <form onSubmit={(e) => handleReplySubmit(e, postForReplyModal.postId)}>
               <ModalBody>
                 <label htmlFor="content">
                   <b>Содржина</b>:
@@ -555,6 +618,38 @@ const Topic = () => {
             </form>
           </ModalContent>
         </Modal>
+      )}
+      {postForReportModal && (
+          <Modal display={reportModalDisplay}>
+            <ModalContent>
+              <ModalHeader>
+                <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
+                <h3 style={{ marginTop: "5px" }}>
+                  Пријава за мислење #{postForReportModal.postId}
+                </h3>
+              </ModalHeader>
+              <form onSubmit={(e) => handleReportSubmit(e, postForReportModal.postId)}>
+                <ModalBody>
+                  <label htmlFor="content">
+                    <b>Наведете причина</b>:
+                    <ModalTextarea
+                        id="content"
+                        rows="8"
+                        cols="100"
+                        value={reportContent}
+                        onChange={handleReportContentChange}
+                    />
+                  </label>
+                </ModalBody>
+                <p
+                    style={{ color: "red", marginLeft: "15px", marginTop: "10px" }}
+                >
+                  {errorMessage}
+                </p>
+                <ModalFooter type="submit">ПРИЈАВИ</ModalFooter>
+              </form>
+            </ModalContent>
+          </Modal>
       )}
     </>
   ) : !fetchError && !loadedThread ? (

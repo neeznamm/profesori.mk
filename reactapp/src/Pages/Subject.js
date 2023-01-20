@@ -32,11 +32,14 @@ import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
 const Subject = () => {
   let params = useParams();
   let navigate = useNavigate();
-
   const { auth, setAuth } = useContext(AuthApi);
+
   const [subject, setSubject] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const [loadedSubject, setLoadedSubject] = useState(false);
+  const [threads, setThreads] = useState(null);
+  const [loadedThreads, setLoadedThreads] = useState(false);
   const [fetchError, setFetchError] = useState(false);
+
   var totalTopics = 0;
   var topics = [];
 
@@ -46,23 +49,24 @@ const Subject = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/public/subject/${params.subjectId}`;
+    Promise.all([fetch(`http://192.168.1.254:8080/public/subject/${params.subjectId}`),
+                        fetch(`http://192.168.1.254:8080/public/subject/${params.subjectId}/threads`)])
+        .then(([resSubject, resThreads]) => Promise.all([resSubject.json(), resThreads.json()]))
+        .then(([dataSubject, dataThreads]) => {
+          let cyclicGraph1 = dataSubject;
+          let jsogStructure1 = JSOG.encode(cyclicGraph1);
+          cyclicGraph1 = JSOG.decode(jsogStructure1);
+          setSubject(cyclicGraph1);
+          setLoadedSubject(true);
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(url);
-        let cyclicGraph = await response.json();
-        let jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setSubject(cyclicGraph);
-        setLoaded(true);
-      } catch (error) {
-        setFetchError(true);
-      }
-    };
+          let cyclicGraph2 = dataThreads;
+          let jsogStructure2 = JSOG.encode(cyclicGraph2);
+          cyclicGraph2 = JSOG.decode(jsogStructure2);
+          setThreads(cyclicGraph2);
+          setLoadedThreads(true);
+        })
 
-    fetchData();
-  }, [params.subjectId]);
+  }, []);
 
   const handleAddTopicButtonClick = () => {
     if (auth) {
@@ -83,7 +87,7 @@ const Subject = () => {
 
     if (!topicTitle.length < 1 && !topicContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.29:8080/secure/subject/${params.subjectId}/addThread`,
+        `http://192.168.1.254:8080/secure/subject/${params.subjectId}/addThread`,
         {
           method: "post",
           data: {
@@ -108,7 +112,7 @@ const Subject = () => {
     setTopicTitle(e.target.value);
   };
 
-  return loaded ? (
+  return loadedSubject ? (
     <>
       <CurrentPageNav>
         &#187;{" "}
@@ -150,7 +154,7 @@ const Subject = () => {
             float: "left",
           }}
         >
-          {subject.threads.map((thread) => {
+          {threads.map((thread) => {
             if (thread.parent === null) {
               totalTopics++;
               topics.push(thread);
@@ -209,7 +213,7 @@ const Subject = () => {
           return (
             <EntityUl key={topic.postId}>
               <EntityLi bgcolor="cornsilk">
-                <a href={"/topic/" + topic.postId}>{topic.title}</a>
+                <a href={"/topic/" + topic.postId}>{topic.title.length >= 99 ? topic.title.slice(0,98) + "..." : topic.title}</a>
                 <EntityParam right="30px">
                   <span style={{ fontWeight: "normal" }}>
                     отворил:{" "}

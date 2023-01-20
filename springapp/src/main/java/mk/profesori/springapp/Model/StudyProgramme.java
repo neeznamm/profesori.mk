@@ -1,22 +1,15 @@
 package mk.profesori.springapp.Model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+import lombok.Data;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.voodoodyne.jackson.jsog.JSOGGenerator;
-
 @Entity
+@Data
 @Table(name = "study_programme")
 @JsonIdentityInfo(generator = JSOGGenerator.class)
 public class StudyProgramme {
@@ -36,28 +29,8 @@ public class StudyProgramme {
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
+    @Transient
     @OneToMany(mappedBy = "studyProgramme")
     private Set<Subject> subjects = new HashSet<>();
-
-    // getters
-    public Long getStudyProgrammeId() {
-        return studyProgrammeId;
-    }
-
-    public String getStudyProgrammeName() {
-        return studyProgrammeName;
-    }
-
-    public int getCycle() {
-        return cycle;
-    }
-
-    public Faculty getFaculty() {
-        return faculty;
-    }
-
-    public Set<Subject> getSubjects() {
-        return subjects;
-    }
 
 }

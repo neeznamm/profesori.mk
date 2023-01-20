@@ -1,30 +1,18 @@
 package mk.profesori.springapp.Controller;
 
+import mk.profesori.springapp.Model.*;
+import mk.profesori.springapp.Service.MainService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import mk.profesori.springapp.Model.City;
-import mk.profesori.springapp.Model.Faculty;
-import mk.profesori.springapp.Model.Professor;
-import mk.profesori.springapp.Model.StudyProgramme;
-import mk.profesori.springapp.Model.Subject;
-import mk.profesori.springapp.Model.University;
-import mk.profesori.springapp.Model._Thread;
-import mk.profesori.springapp.Service.MainService;
-
 @RestController
 @RequestMapping("/public")
-@CrossOrigin(origins = { "http://192.168.0.29:3000", "http://192.168.0.28:3000" })
+@CrossOrigin(origins = { "http://192.168.1.254:3000", "http://192.168.0.28:3000" })
 public class PublicController {
 
     @Autowired
@@ -41,13 +29,23 @@ public class PublicController {
 
     @RequestMapping(value = "/professors/nameContains/{contained}", method = RequestMethod.GET)
     public List<Professor> getProfessorsByNameContains(@PathVariable String contained) {
-        return mainService.getProfessorsByNameContains(contained); // vrakja profesori sto sodrzat "contained" vo
-                                                                   // professorName
+        return mainService.getProfessorsByNameContains(contained); // vrakja profesori sto sodrzat "contained" vo imeto
+
+    }
+
+    @RequestMapping(value = "/subjects/nameContains/{contained}", method = RequestMethod.GET)
+    public List<Subject> getSubjectsByNameContains(@PathVariable String contained) {
+        return mainService.getSubjectsByNameContains(contained); // vrakja predmeti sto sodrzat "contained" vo imeto
     }
 
     @RequestMapping(value = "/professor/{professorId}", method = RequestMethod.GET)
     public Professor getProfessorById(@PathVariable Long professorId) {
         return mainService.getProfessorById(professorId); // vrakja profesor spored id
+    }
+
+    @RequestMapping(value="/professor/{professorId}/relatedOpinions", method = RequestMethod.GET)
+    public List<Opinion> getRelatedOpinions(@PathVariable Long professorId) {
+        return mainService.getRelatedOpinions(professorId);
     }
 
     @RequestMapping(value = "/study_programmes", method = RequestMethod.GET)
@@ -104,6 +102,11 @@ public class PublicController {
         return mainService.getSubjectById(subjectId); // vrakja predmet spored id
     }
 
+    @RequestMapping(value = "/subjects", method = RequestMethod.GET)
+    public List<Subject> getSubjectsByStudyProgramme(@RequestParam Long studyProgrammeId) {
+        return mainService.getSubjectsByStudyProgramme(studyProgrammeId);
+    }
+
     @RequestMapping(value = "/thread/{postId}", method = RequestMethod.GET)
     public _Thread getThreadById(@PathVariable Long postId) {
         return mainService.get_ThreadById(postId); // vrakja thread (tema) spored id
@@ -118,4 +121,40 @@ public class PublicController {
     public Map<String, String> loginSuccessModerator(@RequestParam String sessionId) {
         return Collections.singletonMap("sessionId", sessionId);
     }
+
+    @RequestMapping(value = "/latest10opinions", method = RequestMethod.GET)
+    public List<Opinion> latest10opinions() {
+        return mainService.getLatest10Opinions();
+    }
+
+    @RequestMapping(value = "/latest10threads", method = RequestMethod.GET)
+    public List<_Thread> latest10threads() {
+        return mainService.getLatest10Threads();
+    }
+
+    @RequestMapping(value = "/subject/{id}/threads")
+    public List<_Thread> getThreadsBySubject(@PathVariable Long id) {
+        return mainService.getThreadsBySubject(id);
+    }
+
+    @RequestMapping(value = "/university/{id}/sectionAndPostCount")
+    public List<String> getUniversitySectionCount(@PathVariable Long id) {
+        return mainService.getUniversitySectionAndPostCount();
+    }
+
+    @RequestMapping(value = "/faculty/{id}/opinionCountForEachProfessor")
+    public List<String> getOpinionCountForEachProfessorInFaculty(@PathVariable Long id) {
+        return mainService.getOpinionCountForEachProfessorInFaculty(id);
+    }
+
+    @RequestMapping(value = "/study_programme/{id}/threadCountForEachSubject")
+    public List<String> getThreadCountForEachSubjectInStudyProgramme(@PathVariable Long id) {
+        return mainService.getThreadCountForEachSubjectInStudyProgramme(id);
+    }
+
+    @RequestMapping(value = "/user/{id}")
+    public CustomUserDetails getPublicUserProfile(@PathVariable Long id) {
+        return mainService.getPublicUserProfile(id);
+    }
+
 }

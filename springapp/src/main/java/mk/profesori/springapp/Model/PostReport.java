@@ -1,11 +1,13 @@
 package mk.profesori.springapp.Model;
 
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @NoArgsConstructor
 public class PostReport {
 
@@ -36,53 +38,5 @@ public class PostReport {
         this.time = LocalDateTime.now();
         this.description = description;
         this.resolved=false;
-    }
-
-    public boolean isResolved() {
-        return resolved;
-    }
-
-    public void setResolved(boolean resolved) {
-        this.resolved = resolved;
-    }
-
-    public Long getPostReportId() {
-        return postReportId;
-    }
-
-    public void setPostReportId(Long postReportId) {
-        this.postReportId = postReportId;
-    }
-
-    public CustomUserDetails getUser() {
-        return user;
-    }
-
-    public void setUser(CustomUserDetails user) {
-        this.user = user;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

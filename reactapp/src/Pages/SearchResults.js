@@ -13,14 +13,14 @@ function SearchResults() {
   return (
     <SearchResultsWrapper>
       <h3 style={{ marginBottom: "30px" }}>Резултати од пребарувањето:</h3>
-      {location.state.map((professor) => (
-        <SearchResult key={professor.professorId} margin="10px">
-          <SearchResultLink href={"/professor/" + professor.professorId}>
+      {location.state.map((match) => (
+        <SearchResult key={match.professorId !== undefined ? match.professorId : match.subjectId} margin="10px">
+          <SearchResultLink href={`/${match.professorId !== undefined ? 'professor': 'subject'}/` + `${match.professorId !== undefined ? match.professorId : match.subjectId}`}>
             <SearchResultText weight="bold" size="medium">
-              {professor.professorName}
+              {match.professorId !== undefined ? match.professorName : match.subjectName}
             </SearchResultText>
             <SearchResultText weight="normal" size="er">
-              {professor.faculty.facultyName}
+              {match.professorId !== undefined ? match.faculty.facultyName : match.studyProgramme.faculty.facultyName}
             </SearchResultText>
           </SearchResultLink>
         </SearchResult>

@@ -26,12 +26,16 @@ import {
     ModalInput
 } from "../Components/Styled/Modal.style";
 import LoadingSpinner from "../Components/Styled/LoadingSpinner.style";
+import {findParentThread} from "../Util/findParentThread";
 
 function UserDashboard() {
   const { auth, setAuth } = useContext(AuthApi);
 
   const [user, setUser] = useState(null);
   const [loadedUser, setLoadedUser] = useState(false);
+  const [authoredPosts, setAuthoredPosts] = useState(null);
+  const [loadedAuthoredPosts, setLoadedAuthoredPosts] = useState(false);
+
   const [fetchError, setFetchError] = useState(false);
 
   const [postReports, setPostReports] = useState(null);
@@ -44,15 +48,12 @@ function UserDashboard() {
 
   const [newPostContent, setNewPostContent] = useState("");
   const [newOpinionTargetProfessorId, setNewOpinionTargetProfessorId] = useState("");
-  const [newOpinionTargetProfessor, setNewOpinionTargetProfessor] = useState(null);
-  const [loadedNewProfessor,setLoadedNewProfessor] = useState(false);
   const [newParentPostId, setNewParentPostId] = useState("-1");
 
   const [newThreadTitle, setNewThreadTitle] = useState("");
   const [newParentThreadId,setNewParentThreadId] = useState("-1");
   const [newTargetSubjectId, setNewTargetSubjectId] = useState("");
-  const [newTargetSubject, setNewTargetSubject] = useState(null);
-  const [loadedNewSubject, setLoadedNewSubject] = useState(null);
+
 
   const [markResolved, setMarkResolved] = useState(false);
 
@@ -82,61 +83,98 @@ function UserDashboard() {
     }
   }, [reportForModal]);
 
-  const[loadingProf, setLoadingProf] = useState(false);
+  const [newOpinionTargetProfessor, setNewOpinionTargetProfessor] = useState(null);
+  const [loadedNewProfessor,setLoadedNewProfessor] = useState(false);
+  const [newProfessorRelatedOpinions, setNewProfessorRelatedOpinions] = useState(null);
+  const [loadedNewProfessorRelatedOpinions, setLoadedNewProfessorRelatedOpinions] = useState(false);
+  const [loadingProf, setLoadingProf] = useState(false);
 
   const handleNewTargetProfessorChange = async (e) => {
     setLoadingProf(true);
     e.preventDefault();
     if (newOpinionTargetProfessorId!=="") {
         try {
-          const response = await axios.get(`http://192.168.0.29:8080/public/professor/${newOpinionTargetProfessorId}`, {withCredentials: true});
-          let cyclicGraph = await response.data;
-          var jsogStructure = JSOG.encode(cyclicGraph);
-          cyclicGraph = JSOG.decode(jsogStructure);
-          setNewOpinionTargetProfessor(cyclicGraph);
-          setLoadedNewProfessor(true);
-          setLoadingProf(false);
+          Promise.all([fetch(`http://192.168.1.254:8080/public/professor/${newOpinionTargetProfessorId}`),
+            fetch(`http://192.168.1.254:8080/public/professor/${newOpinionTargetProfessorId}/relatedOpinions`)])
+              .then(([resNewOpinionTargetProfessor, resNewProfessorRelatedOpinions]) => Promise.all([resNewOpinionTargetProfessor.json(), resNewProfessorRelatedOpinions.json()]))
+              .then(([dataNewOpinionTargetProfessor, dataNewProfessorRelatedOpinions]) => {
+                let cyclicGraph1 = dataNewOpinionTargetProfessor;
+                var jsogStructure1 = JSOG.encode(cyclicGraph1);
+                cyclicGraph1 = JSOG.decode(jsogStructure1);
+                setNewOpinionTargetProfessor(cyclicGraph1);
+                setLoadedNewProfessor(true);
+
+                let cyclicGraph2 = dataNewProfessorRelatedOpinions;
+                var jsogStructure2 = JSOG.encode(cyclicGraph2);
+                cyclicGraph2 = JSOG.decode(jsogStructure2);
+                setNewProfessorRelatedOpinions(cyclicGraph2);
+                setLoadedNewProfessorRelatedOpinions(true);
+
+                setLoadingProf(false);
+              })
         } catch (error) {
           setFetchError(true);
         }
     }
   }
 
-  const[loadingSubj, setLoadingSubj] = useState(false);
+  const [newTargetSubject, setNewTargetSubject] = useState(null);
+  const [loadedNewSubject, setLoadedNewSubject] = useState(false);
+  const [newTargetSubjectThreads, setNewTargetSubjectThreads] = useState(null);
+  const [loadedNewSubjectThreads, setLoadedNewSubjectThreads] = useState(false);
+  const [loadingSubj, setLoadingSubj] = useState(false);
 
   const handleNewTargetSubjectChange = async (e) => {
     e.preventDefault();
     setLoadingSubj(true);
     if (newTargetSubjectId!=="") {
       try {
-        const response = await axios.get(`http://192.168.0.29:8080/public/subject/${newTargetSubjectId}`, {withCredentials: true});
-        let cyclicGraph = await response.data;
-        var jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setNewTargetSubject(cyclicGraph);
-        setLoadedNewSubject(true);
-        setLoadingSubj(false);
-      } catch (error) {
-        setFetchError(true);
-      }
+        Promise.all([fetch(`http://192.168.1.254:8080/public/subject/${newTargetSubjectId}`),
+        fetch(`http://192.168.1.254:8080/public/subject/${newTargetSubjectId}/threads`)])
+            .then(([resNewTargetSubject, resNewTargetSubjectThreads]) => Promise.all([resNewTargetSubject.json(), resNewTargetSubjectThreads.json()]))
+            .then(([dataNewTargetSubject, dataNewTargetSubjectThreads]) => {
+              let cyclicGraph1 = dataNewTargetSubject;
+              var jsogStructure1 = JSOG.encode(cyclicGraph1);
+              cyclicGraph1 = JSOG.decode(jsogStructure1);
+              setNewTargetSubject(cyclicGraph1);
+              setLoadedNewSubject(true);
+
+              let cyclicGraph2 = dataNewTargetSubjectThreads;
+              var jsogStructure2 = JSOG.encode(cyclicGraph2);
+              cyclicGraph2 = JSOG.decode(jsogStructure2);
+              setNewTargetSubjectThreads(cyclicGraph2);
+              setLoadedNewSubjectThreads(true);
+
+              setLoadingSubj(false);
+            })
+        } catch (error) {
+            setFetchError(true);
+        }
     }
   }
 
   useEffect(() => {
-    const url1 = `http://192.168.0.29:8080/secure/currentUser`;
-    const url2 = `http://192.168.0.29:8080/secure/getAllPostReports`;
-
-    const fetchUser = async () => {
+    const fetchUser = () => {
       try {
         if(!loadedUser) {
-          const response = await axios.get(url1, {withCredentials: true});
-          let cyclicGraph = await response.data;
-          var jsogStructure = JSOG.encode(cyclicGraph);
-          cyclicGraph = JSOG.decode(jsogStructure);
-          setUser(cyclicGraph);
-          setLoadedUser(true);
+          Promise.all([axios.get(`http://192.168.1.254:8080/secure/currentUser`, {withCredentials:true}),
+            axios.get(`http://192.168.1.254:8080/secure/currentUser/posts`, {withCredentials:true})])
+              .then(([resUser, resAuthoredPosts]) => Promise.all([resUser.data, resAuthoredPosts.data]))
+              .then(([dataUser, dataAuthoredPosts]) => {
+                let cyclicGraph1 = dataUser;
+                let jsogStructure1 = JSOG.encode(cyclicGraph1);
+                cyclicGraph1 = JSOG.decode(jsogStructure1);
+                setUser(cyclicGraph1);
+                setLoadedUser(true);
+
+                let cyclicGraph2 = dataAuthoredPosts;
+                let jsogStructure2 = JSOG.encode(cyclicGraph2);
+                cyclicGraph2 = JSOG.decode(jsogStructure2);
+                setAuthoredPosts(cyclicGraph2);
+                setLoadedAuthoredPosts(true);
+              })
         }
-        if(user.userRole==='MODERATOR')fetchPostReports();
+        if(user.userRole==='MODERATOR') fetchPostReports();
       } catch (error) {
         setFetchError(true);
       }
@@ -144,7 +182,7 @@ function UserDashboard() {
 
     const fetchPostReports = async () => {
       try {
-        const response = await axios.get(url2, {withCredentials: true});
+        const response = await axios.get(`http://192.168.1.254:8080/secure/getAllPostReports`, {withCredentials: true});
         var cyclicGraph = await response.data;
         var jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
@@ -159,23 +197,11 @@ function UserDashboard() {
 
   }, [user]);
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     if (user === null) window.location.reload(); <---- :-)
-  //   }, 3000);
-  //   return () => clearTimeout(timer);
-  // }, []);
-
-  function findParentThread(post) {
-    if (post.parent === null) return post;
-    return findParentThread(post.parent);
-  }
-
   const handleEdit = async (e) => {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        await axios(`http://192.168.0.29:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.254:8080/secure/updateOpinion/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -185,8 +211,12 @@ function UserDashboard() {
               },
               withCredentials: true,
             })
+        await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+          method: "get",
+          withCredentials: true
+        })
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        await axios(`http://192.168.0.29:8080/secure/updateThread/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.254:8080/secure/updateThread/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -198,10 +228,10 @@ function UserDashboard() {
               withCredentials: true,
             })
       }
-        await axios(`http://192.168.0.29:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+      await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
           method: "get",
           withCredentials: true
-        })
+      })
     } catch (error) {
       setFetchError(true);
     }
@@ -212,7 +242,7 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        var response = await axios(`http://192.168.0.29:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+        var response = await axios(`http://192.168.1.254:8080/secure/updateOpinion/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -222,8 +252,12 @@ function UserDashboard() {
               },
               withCredentials: true,
             })
+        await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+          method: "get",
+          withCredentials: true
+        })
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        var response = await axios(`http://192.168.0.29:8080/secure/updateThread/${reportForModal.post.postId}`,
+        var response = await axios(`http://192.168.1.254:8080/secure/updateThread/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -235,7 +269,7 @@ function UserDashboard() {
               withCredentials: true,
             })
       }
-      await axios(`http://192.168.0.29:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+      await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
         method: "get",
         withCredentials: true
       })
@@ -250,14 +284,14 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        await axios(`http://192.168.0.29:8080/secure/deleteOpinion/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.254:8080/secure/deleteOpinion/${reportForModal.post.postId}`,
             {
               method: "delete",
               withCredentials: true,
             })
         window.location.reload();
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        await axios(`http://192.168.0.29:8080/secure/deleteThread/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.254:8080/secure/deleteThread/${reportForModal.post.postId}`,
             {
               method: "delete",
               withCredentials: true,
@@ -311,12 +345,12 @@ function UserDashboard() {
         </EntityLi>;
       })}
       </EntityUl>
-      {user.authoredPosts.length > 0 ? (
+      {authoredPosts.length > 0 ? (
         <h3 style={{ marginBottom: "10px", marginTop:"30px" }}>Ваши мислења:</h3>
       ) : (
         <h3 style={{ marginBottom: "10px" }}>Немате објавени мислења</h3>
       )}
-      {user.authoredPosts.map((post) => {
+      {authoredPosts.map((post) => {
         return (
           <div key={post.postId}>
             <OpinionCard>
@@ -526,7 +560,6 @@ function UserDashboard() {
                                 <p style={{color:"black"}}>Внеси <span style={{fontWeight:"bold"}}>ID</span> на секцијата за дискусија (за <span style={{fontWeight:"bold"}}>професор</span>)
                                     во која треба да биде преместено мислењето:</p>
                                     <div style={{marginTop:"15px"}}>
-                                      <label>
                                         <ModalInput
                                             value={newOpinionTargetProfessorId}
                                             onChange={e => {e.preventDefault();setNewOpinionTargetProfessorId(e.target.value)}}
@@ -541,18 +574,18 @@ function UserDashboard() {
                                         {newOpinionTargetProfessor &&
                                         <select value={newParentPostId} onChange={e => setNewParentPostId(e.target.value)} style={{width:"280px", display:"block", padding:"5px",marginBottom:"5px", fontFamily: "Roboto Mono, monospace"}}>
                                           <option value="-1">Постави како самостојно мислење</option>
-                                          {newOpinionTargetProfessor.relatedOpinions.filter((opinion)=>opinion.postId!==reportForModal.post.postId).map((opinion) => {
+                                          {newProfessorRelatedOpinions.filter((opinion)=>opinion.postId!==reportForModal.post.postId).map((opinion) => {
                                             return <option key={opinion.postId} value={opinion.postId}>{opinion.postId}</option>})
                                           }
                                         </select>}
                                         <br/>
-                                        <input
-                                            type="checkbox"
-                                            defaultChecked={reportForModal.resolved}
-                                            onChange={handleMarkResolved}
-                                        />
-                                        <span style={{marginLeft:"10px", fontWeight:"bold"}}>Означи како разрешено</span>
-                                      </label>
+                                        <label>
+                                          <input
+                                              type="checkbox"
+                                              onChange={handleMarkResolved}
+                                          />
+                                          <span style={{marginLeft:"10px", fontWeight:"bold"}}>Означи како разрешено</span>
+                                        </label>
                                     </div>
                                 {errMsg!=="" && <p style={{color:"red", display:"flex", justifyContent:"space-around"}}>{errMsg}</p>}
                                     <ModalFooter type="submit">ПОТВРДИ</ModalFooter>
@@ -577,7 +610,7 @@ function UserDashboard() {
                                     {newTargetSubject &&
                                         <select value={newParentThreadId} onChange={e => setNewParentThreadId(e.target.value)} style={{width:"370px", display:"block", padding:"5px",marginBottom:"5px", fontFamily: "Roboto Mono, monospace"}}>
                                           <option value="-1">Постави како самостојно мислење (нова тема)</option>
-                                          {newTargetSubject.threads.filter((thread)=>thread.postId!==reportForModal.post.postId).map((thread) => {
+                                          {newTargetSubjectThreads.filter((thread)=>thread.postId!==reportForModal.post.postId).map((thread) => {
                                             return <option key={thread.postId} value={thread.postId}>{thread.postId}</option>})
                                           }
                                         </select>}

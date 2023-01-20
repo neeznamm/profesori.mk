@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import AuthApi from "../api/AuthApi";
 import Cookies from "js-cookie";
 import { LogoutButton } from "./Styled/UserDetails.style";
-import { Navigate } from "react-router-dom";
 
 function Logout() {
   const { auth, setAuth } = useContext(AuthApi);
@@ -12,7 +11,7 @@ function Logout() {
     Cookies.remove("JSESSIONID");
   };
 
-  return <LogoutButton onClick={handleLogout}>Одјави се</LogoutButton>;
+  return <LogoutButton onClick={handleLogout} style={{color:"black"}}>Одјави се</LogoutButton>;
 }
 
 export default Logout;

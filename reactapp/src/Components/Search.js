@@ -12,25 +12,31 @@ import { useNavigate } from "react-router";
 function Search() {
   const [query, setQuery] = useState("");
   const [professors, setProfessors] = useState([]);
+  const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/public/professors/nameContains/${transliterate(
-      query
-    )}`;
-
     const fetchData = async () => {
       try {
-        const response = await fetch(url);
-        var cyclicGraph = await response.json();
-        var jsogStructure = JSOG.encode(cyclicGraph);
-        cyclicGraph = JSOG.decode(jsogStructure);
-        setProfessors(cyclicGraph);
+        Promise.all([fetch(`http://192.168.1.254:8080/public/professors/nameContains/${transliterate(query)}`),
+          fetch(`http://192.168.1.254:8080/public/subjects/nameContains/${transliterate(query)}`)])
+            .then(([resProfessors, resSubjects]) => Promise.all([resProfessors.json(), resSubjects.json()]))
+            .then(([dataProfessors, dataSubjects]) => {
+              let cyclicGraph1 = dataProfessors;
+              let jsogStructure1 = JSOG.encode(cyclicGraph1);
+              cyclicGraph1 = JSOG.decode(jsogStructure1);
+              setProfessors(cyclicGraph1);
+
+              let cyclicGraph2 = dataSubjects;
+              let jsogStructure2 = JSOG.encode(cyclicGraph2);
+              cyclicGraph2 = JSOG.decode(jsogStructure2);
+              setSubjects(cyclicGraph2);
+            })
       } catch (error) {
         console.log("Fetching error", error);
       }
     };
 
-    if (query.length > 2) fetchData();
+    if (query.length > 3) fetchData();
   }, [query]);
 
   const navigate = useNavigate();
@@ -38,7 +44,7 @@ function Search() {
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       setExpanded(false);
-      navigate("/search", { state: professors });
+      navigate("/search", { state: professors.concat(subjects) });
     }
   };
 
@@ -70,27 +76,27 @@ function Search() {
       />
       <SearchDropdown
         display={
-          query.length > 2 && professors.length > 0 && expanded
+          query.length > 3 && (professors.length > 0 || subjects.length > 0) && expanded
             ? "block"
             : "none"
         }
       >
-        {query.length > 2 &&
-          professors.slice(0, 7).map((professor) => (
+        {query.length > 3 &&
+          professors.concat(subjects).slice(0, 7).map((match) => (
             <SearchResult
-              key={professor.professorId}
+              key={match.professorId !== undefined ? match.professorId : match.subjectId}
               onMouseDown={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
               }}
               margin="0"
             >
-              <SearchResultLink href={"/professor/" + professor.professorId}>
+              <SearchResultLink href={`/${match.professorId !== undefined ? 'professor': 'subject'}/` + `${match.professorId !== undefined ? match.professorId : match.subjectId}`}>
                 <SearchResultText weight="bold" size="medium">
-                  {professor.professorName}
+                  {match.professorId !== undefined ? match.professorName : match.subjectName}
                 </SearchResultText>
                 <SearchResultText weight="normal" size="er">
-                  {professor.faculty.facultyName}
+                  {match.professorId !== undefined ? match.faculty.facultyName : match.studyProgramme.faculty.facultyName}
                 </SearchResultText>
               </SearchResultLink>
             </SearchResult>

@@ -3,7 +3,7 @@ import SearchResults from "./Pages/SearchResults";
 import Login from "./Pages/Login";
 import Registration from "./Pages/Registration";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./Pages/Home";
+import Root from "./Components/Root";
 import UserDashboard from "./Pages/UserDashboard";
 import Subject from "./Pages/Subject";
 import University from "./Pages/University";
@@ -14,6 +14,8 @@ import Cookies from "js-cookie";
 import NotFound from "./Pages/NotFound";
 import Topic from "./Pages/Topic";
 import LoadingSpinner from "./Components/Styled/LoadingSpinner.style";
+import Home from "./Pages/Home";
+import PublicUserProfile from "./Pages/PublicUserProfile";
 
 export default function App() {
   const [auth, setAuth] = useState(false);
@@ -50,13 +52,15 @@ export default function App() {
     <AuthApi.Provider value={variableAuth}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
+          <Route path="/" element={<Root />}>
+            <Route path="/" element={<Home/>}/>
             <Route path="login" element={<Login />}></Route>
             <Route path="registration" element={<Registration />}></Route>
             <Route path="professor">
               <Route path=":professorId" element={<Professor />} />
             </Route>
             <Route path="university/:universityId" element={<University />} />
+            <Route path="user/:userId" element={<PublicUserProfile />} />
             <Route path="faculty/:facultyId" element={<Faculty />} />
             <Route path="subject/:subjectId" element={<Subject />} />
             <Route path="topic/:topicId" element={<Topic />} />

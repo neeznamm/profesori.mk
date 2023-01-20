@@ -25,7 +25,7 @@ import {
 } from "../Components/Styled/Modal.style";
 import axios from "../api/axios";
 
-function OpinionTree({ professor }) {
+const OpinionTree = ({professor, relatedOpinions}) => {
   var renderedOpinionIds = [];
   var postCount; // za da ne go pokazuva ispod postot
 
@@ -34,14 +34,18 @@ function OpinionTree({ professor }) {
 
   const [replyModalDisplay, setReplyModalDisplay] = useState("none");
   const [replyContent, setReplyContent] = useState("");
-  const [postForModal, setPostForModal] = useState(null);
+  const [postForReplyModal, setPostForReplyModal] = useState(null);
+  const [reportModalDisplay, setReportModalDisplay] = useState("none");
+  const [reportContent, setReportContent] = useState("")
+  const [postForReportModal, setPostForReportModal] = useState(null);
+
   const [user, setUser] = useState(null);
   const [loadedUser, setLoadedUser] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.0.29:8080/secure/currentUser`;
+    const url = `http://192.168.1.254:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -67,7 +71,7 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.29:8080/secure/upvoteOpinion/${post.postId}`,
+          `http://192.168.1.254:8080/secure/upvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -90,7 +94,7 @@ function OpinionTree({ professor }) {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.0.29:8080/secure/downvoteOpinion/${post.postId}`,
+          `http://192.168.1.254:8080/secure/downvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -109,20 +113,35 @@ function OpinionTree({ professor }) {
   const handleReply = (opinion) => {
     if (auth) {
       setReplyModalDisplay("block");
-      setPostForModal(opinion);
+      setPostForReplyModal(opinion);
       document.body.style.overflowY = "hidden";
     } else {
       navigate("/login");
     }
   };
 
+  const handleReport = (opinion) => {
+    if (auth) {
+      setReportModalDisplay("block");
+      setPostForReportModal(opinion);
+      document.body.style.overflowY = "hidden";
+    } else {
+      navigate("/login");
+    }
+  }
+
   const handleModalCloseClick = () => {
     setReplyModalDisplay("none");
+    setReportModalDisplay("none");
     document.body.style.overflowY = "auto";
   };
 
-  const handleContentChange = (e) => {
+  const handleReplyContentChange = (e) => {
     setReplyContent(e.target.value);
+  };
+
+  const handleReportContentChange = (e) => {
+    setReportContent(e.target.value);
   };
 
   const handleReplySubmit = async (e, postId) => {
@@ -130,7 +149,7 @@ function OpinionTree({ professor }) {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.0.29:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
+        `http://192.168.1.254:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
         {
           method: "post",
           data: {
@@ -146,9 +165,30 @@ function OpinionTree({ professor }) {
     }
   };
 
+  const handleReportSubmit = async (e, postId) => {
+    e.preventDefault();
+
+    if (!reportContent.length < 1) {
+      const response = await axios(
+          `http://192.168.1.254:8080/secure/reportOpinion/${postId}`,
+          {
+            method: "post",
+            data: {
+              description: reportContent,
+            },
+            withCredentials: true,
+          }
+      );
+      setErrorMessage("");
+      window.location.reload();
+    } else {
+      setErrorMessage("Полето за содржина не смее да биде празно");
+    }
+  };
+
   function displayChildPosts(child, parentPostAuthorUsername, replyIndent) {
     if (child == null) return;
-    postCount = renderedOpinionIds.push(child.postId);
+    if (!renderedOpinionIds.includes(child.postId)) {postCount = renderedOpinionIds.push(child.postId);}
     return (
       <div key={child.postId}>
         <OpinionReplyCard indent={replyIndent + "px"}>
@@ -157,7 +197,7 @@ function OpinionTree({ professor }) {
               <a href={"/user/" + child.author.id}>{child.author.username}</a>{" "}
               му реплицирал на {parentPostAuthorUsername}
             </p>
-            <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
+            <p style={{ marginBottom: "10px", maxWidth: "85%" }}>
               {child.content}
             </p>
             {new Date(child.timePosted).setMilliseconds(0) === new Date(child.timeLastEdited).setMilliseconds(0) ? (
@@ -227,6 +267,13 @@ function OpinionTree({ professor }) {
                 color="darkgrey"
                 onClick={() => handleReply(child)}
               />
+
+              <StyledFontAwesomeIcon
+                  icon={solid("flag")}
+                  right={130 + "px"}
+                  color="darkgrey"
+                  onClick={() => handleReport(child)}
+              />
             </div>
           </OpinionReplyCardContent>
           {child.children.map((childOfChild) =>
@@ -243,8 +290,8 @@ function OpinionTree({ professor }) {
 
   return (
     <div className="opinionTree">
-      {professor.relatedOpinions.map((opinion) => {
-        if (!renderedOpinionIds.includes(opinion.postId)) {
+      {relatedOpinions.map((opinion) => {
+        if (!renderedOpinionIds.includes(opinion.postId) && opinion.parent === null) {
           postCount = renderedOpinionIds.push(opinion.postId);
           return (
             <div key={opinion.postId}>
@@ -256,7 +303,7 @@ function OpinionTree({ professor }) {
                     </a>{" "}
                     напишал
                   </p>
-                  <p style={{ marginBottom: "10px", maxWidth: "90%" }}>
+                  <p style={{ marginBottom: "10px", maxWidth: "85%" }}>
                     {opinion.content}
                   </p>
                   {new Date(opinion.timePosted).setMilliseconds(0) === new Date(opinion.timeLastEdited).setMilliseconds(0) ? (
@@ -334,6 +381,13 @@ function OpinionTree({ professor }) {
                       color="darkgrey"
                       onClick={() => handleReply(opinion)}
                     />
+
+                    <StyledFontAwesomeIcon
+                        icon={solid("flag")}
+                        right={130 + "px"}
+                        color="darkgrey"
+                        onClick={() => handleReport(opinion)}
+                    />
                   </div>
                 </OpinionCardContent>
                 {opinion.children.map((child) =>
@@ -345,16 +399,16 @@ function OpinionTree({ professor }) {
         }
         return null;
       })}
-      {postForModal && (
+      {postForReplyModal && (
         <Modal display={replyModalDisplay}>
           <ModalContent>
             <ModalHeader>
               <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
               <h3 style={{ marginTop: "5px" }}>
-                Реплика на {postForModal.author.username}
+                Реплика на {postForReplyModal.author.username}
               </h3>
             </ModalHeader>
-            <form onSubmit={(e) => handleReplySubmit(e, postForModal.postId)}>
+            <form onSubmit={(e) => handleReplySubmit(e, postForReplyModal.postId)}>
               <ModalBody>
                 <label htmlFor="content">
                   <b>Содржина</b>:
@@ -363,7 +417,7 @@ function OpinionTree({ professor }) {
                     rows="8"
                     cols="100"
                     value={replyContent}
-                    onChange={handleContentChange}
+                    onChange={handleReplyContentChange}
                     spellCheck={false}
                   />
                 </label>
@@ -377,6 +431,39 @@ function OpinionTree({ professor }) {
             </form>
           </ModalContent>
         </Modal>
+      )}
+      {postForReportModal && (
+          <Modal display={reportModalDisplay}>
+            <ModalContent>
+              <ModalHeader>
+                <ModalClose onClick={handleModalCloseClick}>&times;</ModalClose>
+                <h3 style={{ marginTop: "5px" }}>
+                  Пријава за мислење #{postForReportModal.postId}
+                </h3>
+              </ModalHeader>
+              <form onSubmit={(e) => handleReportSubmit(e, postForReportModal.postId)}>
+                <ModalBody>
+                  <label htmlFor="content">
+                    <b>Наведете причина</b>:
+                    <ModalTextarea
+                        id="content"
+                        rows="8"
+                        cols="100"
+                        value={reportContent}
+                        onChange={handleReportContentChange}
+                        spellCheck={false}
+                    />
+                  </label>
+                </ModalBody>
+                <p
+                    style={{ color: "red", marginLeft: "15px", marginTop: "10px" }}
+                >
+                  {errorMessage}
+                </p>
+                <ModalFooter type="submit">ПРИЈАВИ</ModalFooter>
+              </form>
+            </ModalContent>
+          </Modal>
       )}
     </div>
   );

@@ -1,22 +1,17 @@
 package mk.profesori.springapp.Model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+import lombok.Data;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
+@Data
 @Table(name = "city")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cityId")
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 public class City {
 
     @Id
@@ -27,20 +22,8 @@ public class City {
     @Column(name = "name")
     private String cityName;
 
+    @Transient
     @OneToMany(mappedBy = "city")
     private Set<University> universities = new HashSet<>();
-
-    // getters
-    public Long getCityId() {
-        return cityId;
-    }
-
-    public String getCityName() {
-        return cityName;
-    }
-
-    public Set<University> getUniversities() {
-        return universities;
-    }
 
 }
