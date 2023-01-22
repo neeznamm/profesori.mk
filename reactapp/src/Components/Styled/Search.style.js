@@ -2,7 +2,7 @@ import styled from "styled-components";
 import searchicon from "../../searchicon.png";
 
 export const SearchBox = styled.input`
-  width: 450px;
+  width: 350px;
   box-sizing: border-box;
   border: 2px solid #ccc;
   font-size: 16px;
@@ -22,7 +22,7 @@ export const SearchDropdown = styled.div`
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   padding: 12px 16px;
   z-index: 1;
-  width: 450px;
+  width: 350px;
   padding: 0;
 `;
 

@@ -21,7 +21,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/secure")
-@CrossOrigin(origins = { "http://192.168.1.254:3000", "http://192.168.0.28:3000" })
+@CrossOrigin(origins = { "http://192.168.1.108:3000", "http://192.168.0.28:3000" })
 public class SecureController {
 
     private final MainService mainService;

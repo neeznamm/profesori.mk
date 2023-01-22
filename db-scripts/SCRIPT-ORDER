@@ -1,0 +1,10 @@
+(0) restore from 'profesori-23-11-2022'
+(1) post-tables-restart
+(2) custom_user_details.sql
+(3) post-opinions.sql
+(4) post-threads.sql
+(5) post-thread-replies-nullsubjectid.sql
+(6) update-thread-replies-setsubjectid.sql
+(7) post-opinion-replies-nullprofessor.sql
+(8) update-opinion-replies-setprofessorid.sql
+(9) sync-sequences.sql

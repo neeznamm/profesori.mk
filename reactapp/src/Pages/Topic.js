@@ -54,8 +54,8 @@ const Topic = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url1 = `http://192.168.1.254:8080/public/thread/${params.topicId}`;
-    const url2 = `http://192.168.1.254:8080/secure/currentUser`;
+    const url1 = `http://192.168.1.108:8080/public/thread/${params.topicId}`;
+    const url2 = `http://192.168.1.108:8080/secure/currentUser`;
 
     const fetchTopic = async () => {
       try {
@@ -120,7 +120,7 @@ const Topic = () => {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.1.254:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
+        `http://192.168.1.108:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${postId}`,
         {
           method: "post",
           data: {
@@ -141,7 +141,7 @@ const Topic = () => {
 
     if (!reportContent.length < 1) {
       const response = await axios(
-          `http://192.168.1.254:8080/secure/reportThread/${postId}`,
+          `http://192.168.1.108:8080/secure/reportThread/${postId}`,
           {
             method: "post",
             data: {
@@ -170,7 +170,7 @@ const Topic = () => {
     e.preventDefault();
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.1.254:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
+        `http://192.168.1.108:8080/secure/subject/${thread.targetSubject.subjectId}/replyToThread/${params.topicId}`,
         {
           method: "post",
           data: {
@@ -203,7 +203,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.1.254:8080/secure/upvoteThread/${post.postId}`,
+          `http://192.168.1.108:8080/secure/upvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -226,7 +226,7 @@ const Topic = () => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.1.254:8080/secure/downvoteThread/${post.postId}`,
+          `http://192.168.1.108:8080/secure/downvoteThread/${post.postId}`,
           {
             method: "get",
             withCredentials: true,

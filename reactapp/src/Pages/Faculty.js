@@ -33,7 +33,7 @@ const Faculty = () => {
   useEffect(() => {
     const fetchProfessors = async () => {
       try {
-        const response = await fetch(`http://192.168.1.254:8080/public/professors?facultyId=${params.facultyId}`);
+        const response = await fetch(`http://192.168.1.108:8080/public/professors?facultyId=${params.facultyId}`);
         let cyclicGraph = await response.json();
         let jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
@@ -46,7 +46,7 @@ const Faculty = () => {
 
     const fetchStudyProgrammes = async () => {
       try {
-        const response2 = await fetch(`http://192.168.1.254:8080/public/study_programmes?facultyId=${params.facultyId}`);
+        const response2 = await fetch(`http://192.168.1.108:8080/public/study_programmes?facultyId=${params.facultyId}`);
         let cyclicGraph2 = await response2.json();
         let jsogStructure2 = JSOG.encode(cyclicGraph2);
         cyclicGraph2 = JSOG.decode(jsogStructure2);
@@ -59,7 +59,7 @@ const Faculty = () => {
 
     const fetchProfessorOpinionCount = async () => {
       try {
-        const response3 = await fetch(`http://192.168.1.254:8080/public/faculty/${params.facultyId}/opinionCountForEachProfessor`);
+        const response3 = await fetch(`http://192.168.1.108:8080/public/faculty/${params.facultyId}/opinionCountForEachProfessor`);
         let cyclicGraph3 = await response3.json();
         let jsogStructure3 = JSOG.encode(cyclicGraph3);
         cyclicGraph3 = JSOG.decode(jsogStructure3);

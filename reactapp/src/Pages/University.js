@@ -27,8 +27,8 @@ const University = () => {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-        Promise.all([fetch(`http://192.168.1.254:8080/public/faculties?universityId=${params.universityId}`),
-        fetch(`http://192.168.1.254:8080/public/university/${params.universityId}/sectionAndPostCount`)])
+        Promise.all([fetch(`http://192.168.1.108:8080/public/faculties?universityId=${params.universityId}`),
+        fetch(`http://192.168.1.108:8080/public/university/${params.universityId}/sectionAndPostCount`)])
             .then(([resFaculties, counts]) => Promise.all([resFaculties.json(), counts.json()]))
             .then(([dataFaculties, dataCounts]) => {
                 let cyclicGraph1 = dataFaculties;

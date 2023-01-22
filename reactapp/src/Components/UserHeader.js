@@ -10,7 +10,7 @@ function UserHeader({}) {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const url = `http://192.168.1.254:8080/secure/currentUser`;
+    const url = `http://192.168.1.108:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {

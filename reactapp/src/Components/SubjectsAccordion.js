@@ -22,8 +22,8 @@ const SubjectsAccordion = (props) => {
       setHeight("auto");
       setOpacity(1);
       try {
-        Promise.all([fetch(`http://192.168.1.254:8080/public/subjects?studyProgrammeId=${props.title.studyProgrammeId}`),
-          fetch(`http://192.168.1.254:8080/public/study_programme/${props.title.studyProgrammeId}/threadCountForEachSubject`)])
+        Promise.all([fetch(`http://192.168.1.108:8080/public/subjects?studyProgrammeId=${props.title.studyProgrammeId}`),
+          fetch(`http://192.168.1.108:8080/public/study_programme/${props.title.studyProgrammeId}/threadCountForEachSubject`)])
             .then(([resSubjects, counts]) => Promise.all([resSubjects.json(), counts.json()]))
             .then(([dataSubjects, dataCounts]) => {
               let cyclicGraph1 = dataSubjects;

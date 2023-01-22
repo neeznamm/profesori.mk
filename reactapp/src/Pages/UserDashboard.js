@@ -94,8 +94,8 @@ function UserDashboard() {
     e.preventDefault();
     if (newOpinionTargetProfessorId!=="") {
         try {
-          Promise.all([fetch(`http://192.168.1.254:8080/public/professor/${newOpinionTargetProfessorId}`),
-            fetch(`http://192.168.1.254:8080/public/professor/${newOpinionTargetProfessorId}/relatedOpinions`)])
+          Promise.all([fetch(`http://192.168.1.108:8080/public/professor/${newOpinionTargetProfessorId}`),
+            fetch(`http://192.168.1.108:8080/public/professor/${newOpinionTargetProfessorId}/relatedOpinions`)])
               .then(([resNewOpinionTargetProfessor, resNewProfessorRelatedOpinions]) => Promise.all([resNewOpinionTargetProfessor.json(), resNewProfessorRelatedOpinions.json()]))
               .then(([dataNewOpinionTargetProfessor, dataNewProfessorRelatedOpinions]) => {
                 let cyclicGraph1 = dataNewOpinionTargetProfessor;
@@ -129,8 +129,8 @@ function UserDashboard() {
     setLoadingSubj(true);
     if (newTargetSubjectId!=="") {
       try {
-        Promise.all([fetch(`http://192.168.1.254:8080/public/subject/${newTargetSubjectId}`),
-        fetch(`http://192.168.1.254:8080/public/subject/${newTargetSubjectId}/threads`)])
+        Promise.all([fetch(`http://192.168.1.108:8080/public/subject/${newTargetSubjectId}`),
+        fetch(`http://192.168.1.108:8080/public/subject/${newTargetSubjectId}/threads`)])
             .then(([resNewTargetSubject, resNewTargetSubjectThreads]) => Promise.all([resNewTargetSubject.json(), resNewTargetSubjectThreads.json()]))
             .then(([dataNewTargetSubject, dataNewTargetSubjectThreads]) => {
               let cyclicGraph1 = dataNewTargetSubject;
@@ -157,8 +157,8 @@ function UserDashboard() {
     const fetchUser = () => {
       try {
         if(!loadedUser) {
-          Promise.all([axios.get(`http://192.168.1.254:8080/secure/currentUser`, {withCredentials:true}),
-            axios.get(`http://192.168.1.254:8080/secure/currentUser/posts`, {withCredentials:true})])
+          Promise.all([axios.get(`http://192.168.1.108:8080/secure/currentUser`, {withCredentials:true}),
+            axios.get(`http://192.168.1.108:8080/secure/currentUser/posts`, {withCredentials:true})])
               .then(([resUser, resAuthoredPosts]) => Promise.all([resUser.data, resAuthoredPosts.data]))
               .then(([dataUser, dataAuthoredPosts]) => {
                 let cyclicGraph1 = dataUser;
@@ -182,7 +182,7 @@ function UserDashboard() {
 
     const fetchPostReports = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.254:8080/secure/getAllPostReports`, {withCredentials: true});
+        const response = await axios.get(`http://192.168.1.108:8080/secure/getAllPostReports`, {withCredentials: true});
         var cyclicGraph = await response.data;
         var jsogStructure = JSOG.encode(cyclicGraph);
         cyclicGraph = JSOG.decode(jsogStructure);
@@ -201,7 +201,7 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        await axios(`http://192.168.1.254:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.108:8080/secure/updateOpinion/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -211,12 +211,12 @@ function UserDashboard() {
               },
               withCredentials: true,
             })
-        await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+        await axios(`http://192.168.1.108:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
           method: "get",
           withCredentials: true
         })
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        await axios(`http://192.168.1.254:8080/secure/updateThread/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.108:8080/secure/updateThread/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -228,7 +228,7 @@ function UserDashboard() {
               withCredentials: true,
             })
       }
-      await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+      await axios(`http://192.168.1.108:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
           method: "get",
           withCredentials: true
       })
@@ -242,7 +242,7 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        var response = await axios(`http://192.168.1.254:8080/secure/updateOpinion/${reportForModal.post.postId}`,
+        var response = await axios(`http://192.168.1.108:8080/secure/updateOpinion/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -252,12 +252,12 @@ function UserDashboard() {
               },
               withCredentials: true,
             })
-        await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+        await axios(`http://192.168.1.108:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
           method: "get",
           withCredentials: true
         })
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        var response = await axios(`http://192.168.1.254:8080/secure/updateThread/${reportForModal.post.postId}`,
+        var response = await axios(`http://192.168.1.108:8080/secure/updateThread/${reportForModal.post.postId}`,
             {
               method: "put",
               data: {
@@ -269,7 +269,7 @@ function UserDashboard() {
               withCredentials: true,
             })
       }
-      await axios(`http://192.168.1.254:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
+      await axios(`http://192.168.1.108:8080/secure/markReportResolved/${reportForModal.postReportId}/${markResolved ? `resolve` : `open`}`,{
         method: "get",
         withCredentials: true
       })
@@ -284,14 +284,14 @@ function UserDashboard() {
     e.preventDefault();
     try {
       if(reportForModal.post !== null && reportForModal.post.targetProfessor !== undefined) {
-        await axios(`http://192.168.1.254:8080/secure/deleteOpinion/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.108:8080/secure/deleteOpinion/${reportForModal.post.postId}`,
             {
               method: "delete",
               withCredentials: true,
             })
         window.location.reload();
       } else if(reportForModal.post !== null && reportForModal.post.targetProfessor === undefined) {
-        await axios(`http://192.168.1.254:8080/secure/deleteThread/${reportForModal.post.postId}`,
+        await axios(`http://192.168.1.108:8080/secure/deleteThread/${reportForModal.post.postId}`,
             {
               method: "delete",
               withCredentials: true,

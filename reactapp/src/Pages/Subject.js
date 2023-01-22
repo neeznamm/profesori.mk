@@ -49,8 +49,8 @@ const Subject = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    Promise.all([fetch(`http://192.168.1.254:8080/public/subject/${params.subjectId}`),
-                        fetch(`http://192.168.1.254:8080/public/subject/${params.subjectId}/threads`)])
+    Promise.all([fetch(`http://192.168.1.108:8080/public/subject/${params.subjectId}`),
+                        fetch(`http://192.168.1.108:8080/public/subject/${params.subjectId}/threads`)])
         .then(([resSubject, resThreads]) => Promise.all([resSubject.json(), resThreads.json()]))
         .then(([dataSubject, dataThreads]) => {
           let cyclicGraph1 = dataSubject;
@@ -87,7 +87,7 @@ const Subject = () => {
 
     if (!topicTitle.length < 1 && !topicContent.length < 1) {
       const response = await axios(
-        `http://192.168.1.254:8080/secure/subject/${params.subjectId}/addThread`,
+        `http://192.168.1.108:8080/secure/subject/${params.subjectId}/addThread`,
         {
           method: "post",
           data: {
@@ -213,7 +213,7 @@ const Subject = () => {
           return (
             <EntityUl key={topic.postId}>
               <EntityLi bgcolor="cornsilk">
-                <a href={"/topic/" + topic.postId}>{topic.title.length >= 99 ? topic.title.slice(0,98) + "..." : topic.title}</a>
+                <a href={"/topic/" + topic.postId}>{topic.title.length >= 65 ? topic.title.slice(0,65) + "..." : topic.title}</a>
                 <EntityParam right="30px">
                   <span style={{ fontWeight: "normal" }}>
                     отворил:{" "}

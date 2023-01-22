@@ -13,8 +13,8 @@ const Home = () => {
     const [loadedLatestThreads, setLoadedLatestThreads] = useState(false);
 
     useEffect(() => {
-        Promise.all([fetch(`http://192.168.1.254:8080/public/latest10opinions`),
-            fetch(`http://192.168.1.254:8080/public/latest10threads`)])
+        Promise.all([fetch(`http://192.168.1.108:8080/public/latest10opinions`),
+            fetch(`http://192.168.1.108:8080/public/latest10threads`)])
             .then(([resOpinions, resThreads]) => Promise.all([resOpinions.json(), resThreads.json()]))
             .then(([dataOpinions, dataThreads]) => {
                 let cyclicGraph1 = dataOpinions;

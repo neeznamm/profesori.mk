@@ -41,8 +41,8 @@ function Professor() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-     Promise.all([fetch(`http://192.168.1.254:8080/public/professor/${params.professorId}`),
-     fetch(`http://192.168.1.254:8080/public/professor/${params.professorId}/relatedOpinions`)])
+     Promise.all([fetch(`http://192.168.1.108:8080/public/professor/${params.professorId}`),
+     fetch(`http://192.168.1.108:8080/public/professor/${params.professorId}/relatedOpinions`)])
         .then(([resProfessor, resRelatedOpinions]) => Promise.all([resProfessor.json(), resRelatedOpinions.json()]))
         .then(([dataProfessor, dataRelatedOpinions]) => {
           let cyclicGraph1 = dataProfessor;
@@ -79,7 +79,7 @@ function Professor() {
 
     if (!postContent.length < 1) {
       const response = await axios(
-        `http://192.168.1.254:8080/secure/professor/${params.professorId}/addOpinion`,
+        `http://192.168.1.108:8080/secure/professor/${params.professorId}/addOpinion`,
         {
           method: "post",
           data: {

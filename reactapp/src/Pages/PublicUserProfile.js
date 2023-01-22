@@ -12,7 +12,7 @@ const PublicUserProfile = () => {
 
     useEffect(() => {
             const fetchPublicProfile = async () => {
-                const resp = await fetch(`http://192.168.1.254:8080/public/user/${params.userId}`)
+                const resp = await fetch(`http://192.168.1.108:8080/public/user/${params.userId}`)
                 let cyclicGraph = await resp.json();
                 let jsogStructure = JSOG.encode(cyclicGraph);
                 cyclicGraph = JSOG.decode(jsogStructure);

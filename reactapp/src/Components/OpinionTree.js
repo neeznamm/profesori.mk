@@ -45,7 +45,7 @@ const OpinionTree = ({professor, relatedOpinions}) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const url = `http://192.168.1.254:8080/secure/currentUser`;
+    const url = `http://192.168.1.108:8080/secure/currentUser`;
 
     const fetchUser = async () => {
       try {
@@ -71,7 +71,7 @@ const OpinionTree = ({professor, relatedOpinions}) => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.1.254:8080/secure/upvoteOpinion/${post.postId}`,
+          `http://192.168.1.108:8080/secure/upvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -94,7 +94,7 @@ const OpinionTree = ({professor, relatedOpinions}) => {
         !post.votes.some((e) => e.user.id === user.id)
       ) {
         const response = await axios(
-          `http://192.168.1.254:8080/secure/downvoteOpinion/${post.postId}`,
+          `http://192.168.1.108:8080/secure/downvoteOpinion/${post.postId}`,
           {
             method: "get",
             withCredentials: true,
@@ -149,7 +149,7 @@ const OpinionTree = ({professor, relatedOpinions}) => {
 
     if (!replyContent.length < 1) {
       const response = await axios(
-        `http://192.168.1.254:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
+        `http://192.168.1.108:8080/secure/professor/${professor.professorId}/replyToOpinion/${postId}`,
         {
           method: "post",
           data: {
@@ -170,7 +170,7 @@ const OpinionTree = ({professor, relatedOpinions}) => {
 
     if (!reportContent.length < 1) {
       const response = await axios(
-          `http://192.168.1.254:8080/secure/reportOpinion/${postId}`,
+          `http://192.168.1.108:8080/secure/reportOpinion/${postId}`,
           {
             method: "post",
             data: {

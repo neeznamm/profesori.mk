@@ -17,8 +17,8 @@ function Search() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        Promise.all([fetch(`http://192.168.1.254:8080/public/professors/nameContains/${transliterate(query)}`),
-          fetch(`http://192.168.1.254:8080/public/subjects/nameContains/${transliterate(query)}`)])
+        Promise.all([fetch(`http://192.168.1.108:8080/public/professors/nameContains/${transliterate(query)}`),
+          fetch(`http://192.168.1.108:8080/public/subjects/nameContains/${transliterate(query)}`)])
             .then(([resProfessors, resSubjects]) => Promise.all([resProfessors.json(), resSubjects.json()]))
             .then(([dataProfessors, dataSubjects]) => {
               let cyclicGraph1 = dataProfessors;
